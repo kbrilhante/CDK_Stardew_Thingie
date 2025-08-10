@@ -1,31 +1,46 @@
+// constants
 const TITLE = "Stardew Valley Thingie";
 const FILE_ID = "stardewFile";
+const JSON_URL_BC = "./data/BigCraftables.json";
+const JSON_URL_CROPS = "./data/Crops.json";
+const JSON_URL_MACHINES = "./data/Machines.json";
+const JSON_URL_OBJECTS = "./data/Objects.json";
+
+// global variables
+let objBigCraftables, objCrops, objMachines, objObjects;
 
 function startup() {
-    document.getElementById(FILE_ID).addEventListener("change", (e) => {
-        const file = e.target.files[0];
+    document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
 
-        if (!file) return;
+    loadJson(JSON_URL_BC).then((data) => {objBigCraftables = data});
+    loadJson(JSON_URL_CROPS).then((data) => {objCrops = data});
+    loadJson(JSON_URL_MACHINES).then((data) => {objMachines = data});
+    loadJson(JSON_URL_OBJECTS).then((data) => {objObjects = data});
+}
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const contents = e.target.result;
-
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(contents, "application/xml");
-
-            // console.log(xmlDoc)
-
-            const saveFile = xmlToJson(xmlDoc.documentElement);
-            handleSaveFile(saveFile);
-        }
-
-        reader.onerror = (err) => {
-            console.error("Error reading file: ", err);
-        }
-
-        reader.readAsText(file);
-    });
+function loadSaveFile(e) {
+    const file = e.target.files[0];
+    
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const contents = e.target.result;
+    
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(contents, "application/xml");
+    
+        // console.log(xmlDoc)
+    
+        const saveFile = xmlToJson(xmlDoc.documentElement);
+        handleSaveFile(saveFile);
+    }
+    
+    reader.onerror = (err) => {
+        console.error("Error reading file: ", err);
+    }
+    
+    reader.readAsText(file);
 }
 
 function handleSaveFile(saveObj) {
