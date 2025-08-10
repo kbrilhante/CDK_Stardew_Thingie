@@ -14,8 +14,10 @@ function startup() {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(contents, "application/xml");
 
-            console.log(xmlDoc);
+            console.log(xmlDoc)
 
+            const saveFile = xmlToJson(xmlDoc.documentElement);
+            handleSaveFile(saveFile);
         }
 
         reader.onerror = (err) => {
@@ -23,5 +25,12 @@ function startup() {
         }
 
         reader.readAsText(file);
+
     });
+}
+
+function handleSaveFile(saveObj) {
+    // console.log(saveObj.player.items)
+    console.log(saveObj.locations.GameLocation[0].buildings)
+    console.log(saveObj.locations.GameLocation[0].objects)
 }
