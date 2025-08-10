@@ -30,9 +30,9 @@ function startup() {
 
 function handleSaveFile(saveObj) {
     let inventory = {};
-    
+
     console.log(saveObj)
-    
+
     const allItems = sortItemsByLocation(saveObj);
     inventory = getChests(allItems);
 
@@ -76,6 +76,7 @@ function getChestItems(chest) {
         if (!item.name) continue;
         const chestItem = {
             name: item.name["#text"],
+            itemId: item.itemId["#text"],
         };
         chestItem.item = item ? item : null
         chestItem.price = item.price ? item.price["#text"] : null;
@@ -83,7 +84,7 @@ function getChestItems(chest) {
         chestItem.type = item.type ? item.type["#text"] : null;
         chestItem.stack = item.stack ? item.stack["#text"] : null;
         // chestItem["xsi:type"] = item["@attributes"] ? item["@attributes"]["xsi:type"] : null;
-        
+
         chestItems.push(chestItem);
     }
     return chestItems;
