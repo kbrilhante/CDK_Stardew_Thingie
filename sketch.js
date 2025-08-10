@@ -15,6 +15,16 @@ function startup() {
 
     loadJsonFiles().then((data) => {
         console.log(data);
+        let bc = data.objBigCraftables;
+        let machines = {};
+        for (let id in bc) {
+            let bcName = bc[id].Name;
+            if (MACHINES.includes(bcName)) {
+                machines[id] = bc[id];
+                machines[id].machineDetails = data.objMachines["(BC)"+id];
+            }
+        }
+        console.log(machines)
     });
 }
 
