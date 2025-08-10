@@ -23,9 +23,12 @@ function content() {
     inpFile.className = "form-control";
     divFile.appendChild(inpFile);
     
+    const txtInstructions = document.createElement("p");
+    txtInstructions.textContent = "Use the full name of the farm as \"SaveGameInfo\" does not have all the information needed."
+    txtInstructions.className = "fs-6 text-muted mb-0 mt-2";
+    divFile.appendChild(txtInstructions);
+
     const txtFileLocation = document.createElement("p");
-    // inpText.textContent = "Windows: %AppData%\StardewValley\Saves\
-    // Mac OSX & Linux: ~/.config/StardewValley/Saves/"
     txtFileLocation.textContent = "File locations:"
     txtFileLocation.className = "fs-6 text-muted mb-0 mt-2";
     divFile.appendChild(txtFileLocation);
@@ -34,15 +37,11 @@ function content() {
     divFile.appendChild(ulLocationsList);
     
     const txtFileLocationWin = document.createElement("li");
-    // inpText.textContent = "Windows: %AppData%\StardewValley\Saves\
-    // Mac OSX & Linux: ~/.config/StardewValley/Saves/"
     txtFileLocationWin.textContent = "Windows: %AppData%\\StardewValley\\Saves\\"
     txtFileLocationWin.className = "fs-6 text-muted";
     ulLocationsList.appendChild(txtFileLocationWin);
 
     const txtFileLocationMacLinux = document.createElement("li");
-    // inpText.textContent = "Windows: %AppData%\StardewValley\Saves\
-    // Mac OSX & Linux: ~/.config/StardewValley/Saves/"
     txtFileLocationMacLinux.textContent = "Mac OSX & Linux: ~/.config/StardewValley/Saves/"
     txtFileLocationMacLinux.className = "fs-6 text-muted";
     ulLocationsList.appendChild(txtFileLocationMacLinux);
