@@ -2,9 +2,15 @@
 const TITLE = "Stardew Valley Thingie";
 const FILE_ID = "stardewFile";
 const JSON_URL_BC = "./data/BigCraftables.json";
-const JSON_URL_CROPS = "./data/Crops.json";
+const JSON_URL_CATEGORIES = "./data/categories.json";
+const JSON_URL_ITEM_TYPES = "./data/item_types.json";
 const JSON_URL_MACHINES = "./data/Machines.json";
 const JSON_URL_OBJECTS = "./data/Objects.json";
+const JSON_URL_PROFESSIONS = "./data/professions.json";
+const JSON_URL_QUALITY = "./data/quality.json";
+const BEAR_KNOWLEDGE_EVENT = "2120303";
+const SPRING_ONION_MASTERY_EVENT = "3910979";
+
 const MACHINES = ["Preserves Jar", "Keg", "Dehydrator"];
 
 // global variables
@@ -15,30 +21,46 @@ function startup() {
 
     loadJsonFiles().then((data) => {
         console.log(data);
-        let bc = data.objBigCraftables;
-        let machines = {};
-        for (let id in bc) {
-            let bcName = bc[id].Name;
-            if (MACHINES.includes(bcName)) {
-                machines[id] = bc[id];
-                machines[id].machineDetails = data.objMachines["(BC)"+id];
-            }
-        }
-        console.log(machines)
+        getMachineDetails(data);
     });
+}
+
+function getMachineDetails(data) {
+    const bc = data.BigCraftables;
+    const machines = {};
+    for (const id in bc) {
+        const bcName = bc[id].Name;
+        if (MACHINES.includes(bcName)) {
+            console.log(bcName);
+            const machineDetails = data.Machines["(BC)" + id];
+            const outputRules = machineDetails.OutputRules;
+            console.log(getOutputAndTriggers(outputRules))
+        }
+    }
+    console.log(machines);
+}
+
+function getOutputAndTriggers(outputRules) {
+
 }
 
 async function loadJsonFiles() {
     const objBigCraftables = await loadJsonContent(JSON_URL_BC);
-    const objCrops = await loadJsonContent(JSON_URL_CROPS);
+    const objCategories = await loadJsonContent(JSON_URL_CATEGORIES);
+    const objItemTypes = await loadJsonContent(JSON_URL_ITEM_TYPES);
     const objMachines = await loadJsonContent(JSON_URL_MACHINES);
     const objObjects = await loadJsonContent(JSON_URL_OBJECTS);
+    const objProfessions = await loadJsonContent(JSON_URL_PROFESSIONS);
+    const objQuality = await loadJsonContent(JSON_URL_QUALITY);
 
     let obj = {
-        objBigCraftables: objBigCraftables,
-        objCrops: objCrops,
-        objMachines: objMachines,
-        objObjects: objObjects,
+        BigCraftables: objBigCraftables,
+        Categories: objCategories,
+        ItemTypes: objItemTypes,
+        Machines: objMachines,
+        Objects: objObjects,
+        Professions: objProfessions,
+        Quality: objQuality,
     }
 
     return obj;
@@ -83,6 +105,7 @@ function handleSaveFile(saveObj) {
     inventory = getChests(allItems);
 
     const player = saveObj.player;
+    console.log("player", player)
     const playerInventory = getChestItems(player);
     inventory["PlayerInventory"] = playerInventory;
     console.log(inventory)

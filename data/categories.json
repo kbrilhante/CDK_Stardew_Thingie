@@ -1,0 +1,314 @@
+[
+  {
+    "value": -2,
+    "internal constant": "Object.GemCategory",
+    "context tag": "category_gem",
+    "English translation": "Mineral",
+    "Color": "#6E005A",
+    "Properties": "Affected by Gemologist profession"
+  },
+  {
+    "value": -4,
+    "internal constant": "Object.FishCategory",
+    "context tag": "category_fish",
+    "English translation": "Fish",
+    "Color": "#00008B (DarkBlue)",
+    "Properties": "Affected by Fisher and Angler professions"
+  },
+  {
+    "value": -5,
+    "internal constant": "Object.EggCategory",
+    "context tag": "category_egg",
+    "English translation": "Animal Product",
+    "Color": "#FF0064",
+    "Properties": "Affected by Rancher profession, can be used in a slingshot"
+  },
+  {
+    "value": -6,
+    "internal constant": "Object.MilkCategory",
+    "context tag": "category_milk",
+    "English translation": "Animal Product",
+    "Color": "#FF0064",
+    "Properties": "Affected by Rancher profession"
+  },
+  {
+    "value": -7,
+    "internal constant": "Object.CookingCategory",
+    "context tag": "category_cooking",
+    "English translation": "Cooking",
+    "Color": "#DC3C00",
+    "Properties": ""
+  },
+  {
+    "value": -8,
+    "internal constant": "Object.CraftingCategory",
+    "context tag": "category_crafting",
+    "English translation": "Crafting",
+    "Color": "#943D28",
+    "Properties": "Is Placeable"
+  },
+  {
+    "value": -9,
+    "internal constant": "Object.BigCraftableCategory",
+    "context tag": "category_big_craftable",
+    "English translation": "",
+    "Color": "",
+    "Properties": "Is Placeable"
+  },
+  {
+    "value": -12,
+    "internal constant": "Object.mineralsCategory",
+    "context tag": "category_minerals",
+    "English translation": "Mineral",
+    "Color": "#6E005A",
+    "Properties": "Affected by Gemologist profession"
+  },
+  {
+    "value": -14,
+    "internal constant": "Object.meatCategory",
+    "context tag": "category_meat",
+    "English translation": "Animal Product",
+    "Color": "#FF0064",
+    "Properties": ""
+  },
+  {
+    "value": -15,
+    "internal constant": "Object.metalResources",
+    "context tag": "category_metal_resources",
+    "English translation": "Resource",
+    "Color": "#406672",
+    "Properties": ""
+  },
+  {
+    "value": -16,
+    "internal constant": "Object.buildingResources",
+    "context tag": "category_building_resources",
+    "English translation": "Resource",
+    "Color": "#406672",
+    "Properties": ""
+  },
+  {
+    "value": -17,
+    "internal constant": "Object.sellAtPierres",
+    "context tag": "category_sell_at_pierres",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -18,
+    "internal constant": "Object.sellAtPierresAndMarnies",
+    "context tag": "category_sell_at_pierres_and_marnies",
+    "English translation": "Animal Product",
+    "Color": "#FF0064",
+    "Properties": "Affected by Rancher profession"
+  },
+  {
+    "value": -19,
+    "internal constant": "Object.fertilizerCategory",
+    "context tag": "category_fertilizer",
+    "English translation": "Fertilizer",
+    "Color": "#708090 (SlateGray)",
+    "Properties": "Is Placeable, is always passable"
+  },
+  {
+    "value": -20,
+    "internal constant": "Object.junkCategory",
+    "context tag": "category_junk",
+    "English translation": "Trash",
+    "Color": "#696969 (DimGray)",
+    "Properties": ""
+  },
+  {
+    "value": -21,
+    "internal constant": "Object.baitCategory",
+    "context tag": "category_bait",
+    "English translation": "Bait",
+    "Color": "#8B0000 (DarkRed)",
+    "Properties": "Can be attached to a fishing rod"
+  },
+  {
+    "value": -22,
+    "internal constant": "Object.tackleCategory",
+    "context tag": "category_tackle",
+    "English translation": "Fishing Tackle",
+    "Color": "#008B8B (DarkCyan)",
+    "Properties": "Can be attached to a fishing rod, cannot stack"
+  },
+  {
+    "value": -23,
+    "internal constant": "Object.sellAtFishShopCategory",
+    "context tag": "category_sell_at_fish_shop",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -24,
+    "internal constant": "Object.furnitureCategory",
+    "context tag": "category_furniture",
+    "English translation": "Decor",
+    "Color": "#9650BE",
+    "Properties": ""
+  },
+  {
+    "value": -25,
+    "internal constant": "Object.ingredientsCategory",
+    "context tag": "category_ingredients",
+    "English translation": "Cooking",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -26,
+    "internal constant": "Object.artisanGoodsCategory",
+    "context tag": "category_artisan_goods",
+    "English translation": "Artisan Goods",
+    "Color": "#009B6F",
+    "Properties": "Affected by Artisan profession"
+  },
+  {
+    "value": -27,
+    "internal constant": "Object.syrupCategory",
+    "context tag": "category_syrup",
+    "English translation": "Artisan Goods",
+    "Color": "#009B6F",
+    "Properties": "Affected by Tapper profession"
+  },
+  {
+    "value": -28,
+    "internal constant": "Object.monsterLootCategory",
+    "context tag": "category_monster_loot",
+    "English translation": "Monster Loot",
+    "Color": "#320A46",
+    "Properties": ""
+  },
+  {
+    "value": -29,
+    "internal constant": "Object.equipmentCategory",
+    "context tag": "category_equipment",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -74,
+    "internal constant": "Object.SeedsCategory",
+    "context tag": "category_seeds",
+    "English translation": "Seed",
+    "Color": "#A52A2A (Brown)",
+    "Properties": "Is Placeable, is always passable"
+  },
+  {
+    "value": -75,
+    "internal constant": "Object.VegetableCategory",
+    "context tag": "category_vegetable",
+    "English translation": "Vegetable",
+    "Color": "#008000 (Green)",
+    "Properties": "Affected by Tiller profession, can be used in a slingshot"
+  },
+  {
+    "value": -79,
+    "internal constant": "Object.FruitsCategory",
+    "context tag": "category_fruits",
+    "English translation": "Fruit",
+    "Color": "#FF1493 (DeepPink)",
+    "Properties": "Affected by Tiller profession (if not foraged), can be used in a slingshot"
+  },
+  {
+    "value": -80,
+    "internal constant": "Object.flowersCategory",
+    "context tag": "category_flowers",
+    "English translation": "Flower",
+    "Color": "#DB36D3",
+    "Properties": "Affected by Tiller profession"
+  },
+  {
+    "value": -81,
+    "internal constant": "Object.GreensCategory",
+    "context tag": "category_greens",
+    "English translation": "Forage",
+    "Color": "#0A8232",
+    "Properties": ""
+  },
+  {
+    "value": -95,
+    "internal constant": "Object.hatCategory",
+    "context tag": "category_hat",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -96,
+    "internal constant": "Object.ringCategory",
+    "context tag": "category_ring",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -97,
+    "internal constant": "Object.bootsCategory",
+    "context tag": "category_boots",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -98,
+    "internal constant": "Object.weaponCategory",
+    "context tag": "category_weapon",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -99,
+    "internal constant": "Object.toolCategory",
+    "context tag": "category_tool",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -100,
+    "internal constant": "Object.clothingCategory",
+    "context tag": "category_clothing",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -101,
+    "internal constant": "Object.trinketCategory",
+    "context tag": "category_trinket",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  },
+  {
+    "value": -102,
+    "internal constant": "Object.booksCategory",
+    "context tag": "",
+    "English translation": "",
+    "Color": "#552F1B",
+    "Properties": ""
+  },
+  {
+    "value": -103,
+    "internal constant": "Object.skillBooksCategory",
+    "context tag": "",
+    "English translation": "",
+    "Color": "#7A5d27",
+    "Properties": ""
+  },
+  {
+    "value": -999,
+    "internal constant": "Object.litterCategory",
+    "context tag": "category_litter",
+    "English translation": "",
+    "Color": "",
+    "Properties": ""
+  }
+]

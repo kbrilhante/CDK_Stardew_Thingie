@@ -1,0 +1,146 @@
+[
+  {
+    "item type": "Objects",
+    "type identifier": "(O)",
+    "data asset": "Data/Objects",
+    "brief summary": "The most common item type. Depending on their data, they can be placed in the world, picked up, eaten, sold to shops, etc."
+  },
+  {
+    "item type": "Big craftables",
+    "type identifier": "(BC)",
+    "data asset": "Data/BigCraftables",
+    "brief summary": "Items which can be placed in the world and are two tiles tall (instead of one like objects)."
+  },
+  {
+    "item type": "Boots",
+    "type identifier": "(B)",
+    "data asset": "Data/Boots",
+    "brief summary": "Items which can be equipped in the player's boots slot. These change the player sprite and may provide buffs."
+  },
+  {
+    "item type": "Furniture",
+    "type identifier": "(F)",
+    "data asset": "Data/Furniture",
+    "brief summary": "Decorative items which can be placed in the world. In some cases players can sit on them or place items on them."
+  },
+  {
+    "item type": "Hats",
+    "type identifier": "(H)",
+    "data asset": "Data/Hats",
+    "brief summary": "Items which can be equipped in the player's hat slot. These change the player sprite."
+  },
+  {
+    "item type": "Mannequins",
+    "type identifier": "(M)",
+    "data asset": "Data/Mannequins",
+    "brief summary": "Decorative items which can be placed in the world, and used to store and display clothing."
+  },
+  {
+    "item type": "Pants",
+    "type identifier": "(P)",
+    "data asset": "Data/Pants",
+    "brief summary": "Items which can be equipped in the player's pants slot. These change the player sprite."
+  },
+  {
+    "item type": "Shirts",
+    "type identifier": "(S)",
+    "data asset": "Data/Shirts",
+    "brief summary": "Items which can be equipped in the player's shirt slot. These change the player sprite."
+  },
+  {
+    "item type": "Tools",
+    "type identifier": "(T)",
+    "data asset": "Data/Tools",
+    "brief summary": "Items that can be swung or used by the player to perform some effect (e.g. dig dirt, chop trees, milk or shear animals, etc)."
+  },
+  {
+    "item type": "Trinkets",
+    "type identifier": "(TR)",
+    "data asset": "Data/Trinkets",
+    "brief summary": "Items that can be equipped in the player's trinket slot to enable special effects."
+  },
+  {
+    "item type": "Wallpaper & flooring",
+    "type identifier": "(WP) and (FL)",
+    "data asset": "Data/AdditionalWallpaperFlooring",
+    "brief summary": "Items which can be applied to a decoratable location (e.g. a farmhouse or shed) to visually change its floor or wall design. (These are separate from placeable items like brick floor.)"
+  },
+  {
+    "item type": "Weapons",
+    "type identifier": "(W)",
+    "data asset": "Data/Weapons",
+    "brief summary": "Items which can be swung or used by the player to damage monsters."
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  },
+  {
+    "item type": "",
+    "type identifier": "",
+    "data asset": "",
+    "brief summary": ""
+  }
+]

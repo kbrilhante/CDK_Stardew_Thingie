@@ -1,0 +1,26 @@
+[
+  {
+    "quality": "normal",
+    "value": 0,
+    "constant": "Object.lowQuality",
+    "multiplier": 1
+  },
+  {
+    "quality": "silver",
+    "value": 1,
+    "constant": "Object.medQuality",
+    "multiplier": 1.25
+  },
+  {
+    "quality": "gold",
+    "value": 2,
+    "constant": "Object.highQuality",
+    "multiplier": 1.5
+  },
+  {
+    "quality": "iridium",
+    "value": 4,
+    "constant": "Object.bestQuality",
+    "multiplier": 2
+  }
+]
