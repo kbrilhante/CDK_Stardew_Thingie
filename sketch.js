@@ -5,41 +5,62 @@ const JSON_URL_BC = "./data/BigCraftables.json";
 const JSON_URL_CROPS = "./data/Crops.json";
 const JSON_URL_MACHINES = "./data/Machines.json";
 const JSON_URL_OBJECTS = "./data/Objects.json";
+const MACHINES = ["Preserves Jar", "Keg", "Dehydrator"];
 
 // global variables
-let objBigCraftables, objCrops, objMachines, objObjects;
+// let objGameData;
 
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
 
-    loadJson(JSON_URL_BC).then((data) => {objBigCraftables = data});
-    loadJson(JSON_URL_CROPS).then((data) => {objCrops = data});
-    loadJson(JSON_URL_MACHINES).then((data) => {objMachines = data});
-    loadJson(JSON_URL_OBJECTS).then((data) => {objObjects = data});
+    loadJsonFiles().then((data) => {
+        console.log(data);
+    });
+}
+
+async function loadJsonFiles() {
+    const objBigCraftables = await loadJsonContent(JSON_URL_BC);
+    const objCrops = await loadJsonContent(JSON_URL_CROPS);
+    const objMachines = await loadJsonContent(JSON_URL_MACHINES);
+    const objObjects = await loadJsonContent(JSON_URL_OBJECTS);
+
+    let obj = {
+        objBigCraftables: objBigCraftables,
+        objCrops: objCrops,
+        objMachines: objMachines,
+        objObjects: objObjects,
+    }
+
+    return obj;
+}
+
+async function loadJsonContent(url) {
+    let data = await loadJson(url);
+    return data.content;
 }
 
 function loadSaveFile(e) {
     const file = e.target.files[0];
-    
+
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
         const contents = e.target.result;
-    
+
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(contents, "application/xml");
-    
+
         // console.log(xmlDoc)
-    
+
         const saveFile = xmlToJson(xmlDoc.documentElement);
         handleSaveFile(saveFile);
     }
-    
+
     reader.onerror = (err) => {
         console.error("Error reading file: ", err);
     }
-    
+
     reader.readAsText(file);
 }
 
@@ -50,12 +71,6 @@ function handleSaveFile(saveObj) {
 
     const allItems = sortItemsByLocation(saveObj);
     inventory = getChests(allItems);
-
-    // console.log(saveObj.player.items)
-    // console.log(saveObj.locations.GameLocation[0].buildings.Building)
-    // for (let building of saveObj.locations.GameLocation[0].buildings.Building) {
-    //     console.log(building.buildingType["#text"])
-    // }
 
     const player = saveObj.player;
     const playerInventory = getChestItems(player);
@@ -98,7 +113,6 @@ function getChestItems(chest) {
         chestItem.quality = item.quality ? item.quality["#text"] : null;
         chestItem.type = item.type ? item.type["#text"] : null;
         chestItem.stack = item.stack ? item.stack["#text"] : null;
-        // chestItem["xsi:type"] = item["@attributes"] ? item["@attributes"]["xsi:type"] : null;
 
         chestItems.push(chestItem);
     }
