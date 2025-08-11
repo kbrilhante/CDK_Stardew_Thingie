@@ -3,6 +3,7 @@ const TITLE = "Stardew Valley Thingie";
 const FILE_ID = "stardewFile";
 const JSON_URL_BC = "./data/BigCraftables.json";
 const JSON_URL_CATEGORIES = "./data/categories.json";
+const JSON_URL_COLORS = "./data/colors.json"
 const JSON_URL_ITEM_TYPES = "./data/item_types.json";
 const JSON_URL_MACHINES = "./data/Machines.json";
 const JSON_URL_OBJECTS = "./data/Objects.json";
@@ -47,6 +48,7 @@ function getOutputAndTriggers(outputRules) {
 async function loadJsonFiles() {
     const objBigCraftables = await loadJsonContent(JSON_URL_BC);
     const objCategories = await loadJsonContent(JSON_URL_CATEGORIES);
+    const objColors = await loadJsonContent(JSON_URL_COLORS);
     const objItemTypes = await loadJsonContent(JSON_URL_ITEM_TYPES);
     const objMachines = await loadJsonContent(JSON_URL_MACHINES);
     const objObjects = await loadJsonContent(JSON_URL_OBJECTS);
@@ -56,6 +58,7 @@ async function loadJsonFiles() {
     let obj = {
         BigCraftables: objBigCraftables,
         Categories: objCategories,
+        Colors: objColors,
         ItemTypes: objItemTypes,
         Machines: objMachines,
         Objects: objObjects,
