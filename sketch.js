@@ -1,39 +1,54 @@
 // constants
 const TITLE = "Stardew Valley Thingie";
 const FILE_ID = "stardewFile";
-const JSON_URL_BC = "./data/BigCraftables.json";
-const JSON_URL_CATEGORIES = "./data/categories.json";
-const JSON_URL_COLORS = "./data/colors.json"
-const JSON_URL_ITEM_TYPES = "./data/item_types.json";
-const JSON_URL_MACHINES = "./data/Machines.json";
-const JSON_URL_OBJECTS = "./data/Objects.json";
-const JSON_URL_PROFESSIONS = "./data/professions.json";
-const JSON_URL_QUALITY = "./data/quality.json";
+const JSON_URL_BC = "./Data/BigCraftables.json";
+const JSON_URL_CATEGORIES = "./Data/categories.json";
+const JSON_URL_COLORS = "./Data/colors.json"
+const JSON_URL_ITEM_TYPES = "./Data/item_types.json";
+const JSON_URL_MACHINES = "./Data/Machines.json";
+const JSON_URL_OBJECTS = "./Data/Objects.json";
+const JSON_URL_PROFESSIONS = "./Data/professions.json";
+const JSON_URL_QUALITY = "./Data/quality.json";
 const BEAR_KNOWLEDGE_EVENT = "2120303";
 const SPRING_ONION_MASTERY_EVENT = "3910979";
 
 const MACHINES = ["Preserves Jar", "Keg", "Dehydrator"];
 
 // global variables
-// let objGameData;
+let objGameData;
 
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
 
     loadJsonFiles().then((data) => {
-        console.log(data);
-        getMachineDetails(data);
+        objGameData = data;
+        console.log(objGameData);
+        test();
+        getMachineDetails();
     });
 }
 
-function getMachineDetails(data) {
-    const bc = data.BigCraftables;
+function test() {
+    const objects = objGameData.Objects;
+    const arr = [];
+    for(let id in objects){
+        const object = objects[id];
+        const contextTags = object.ContextTags;
+        if (contextTags && contextTags.includes('use_reverse_name_for_sorting')) {
+            arr.push(object)
+        }
+    }
+    console.log(arr)
+}
+
+function getMachineDetails() {
+    const bc = objGameData.BigCraftables;
     const machines = {};
     for (const id in bc) {
         const bcName = bc[id].Name;
         if (MACHINES.includes(bcName)) {
             console.log(bcName);
-            const machineDetails = data.Machines["(BC)" + id];
+            const machineDetails = objGameData.Machines["(BC)" + id];
             const outputRules = machineDetails.OutputRules;
             console.log(getOutputAndTriggers(outputRules))
         }
@@ -42,29 +57,111 @@ function getMachineDetails(data) {
 }
 
 function getOutputAndTriggers(outputRules) {
+    // console.log(outputRules)
+    for (let out of outputRules) {
+        const outTriggers = out.Triggers;
+        const outputItems = out.OutputItem;
+        console.log(out)
+        // console.log("triggers", outTriggers)
+        // console.log("output", outputItems)
+        const obj = {
+            triggers: []
+        };
+        for (const objTrigger of outTriggers) {
+            const triggers = getTriggers(objTrigger);
+            for (const tr of triggers) {
+                obj.triggers.push(tr);
+            }
+        }
+        for (const output of outputItems) {
+            getOutput(output);
+        }
+        console.log(obj)
+        console.log("----------------")
+    }
+}
+
+function getOutput(output) {
+    console.log("O", output);
 
 }
 
-async function loadJsonFiles() {
-    const objBigCraftables = await loadJsonContent(JSON_URL_BC);
-    const objCategories = await loadJsonContent(JSON_URL_CATEGORIES);
-    const objColors = await loadJsonContent(JSON_URL_COLORS);
-    const objItemTypes = await loadJsonContent(JSON_URL_ITEM_TYPES);
-    const objMachines = await loadJsonContent(JSON_URL_MACHINES);
-    const objObjects = await loadJsonContent(JSON_URL_OBJECTS);
-    const objProfessions = await loadJsonContent(JSON_URL_PROFESSIONS);
-    const objQuality = await loadJsonContent(JSON_URL_QUALITY);
-
-    let obj = {
-        BigCraftables: objBigCraftables,
-        Categories: objCategories,
-        Colors: objColors,
-        ItemTypes: objItemTypes,
-        Machines: objMachines,
-        Objects: objObjects,
-        Professions: objProfessions,
-        Quality: objQuality,
+function getTriggers(trigger) {
+    let reqId = trigger.RequiredItemId;
+    let objects = [];
+    if (reqId) {
+        reqId = reqId.replace("(O)", "");
+        objects.push(getTrigger(reqId, trigger));
+    } else {
+        let tags = trigger.RequiredTags
+        const objIds = getObjectsIds(tags);
+        for (const id of objIds) {
+            const obj = getTrigger(id, trigger);
+            obj.requiredCount = trigger.RequiredCount;
+            objects.push(obj);
+        }
     }
+    return objects;
+}
+
+function getTrigger(id, trigger) {
+    const obj = getObject(id);
+    obj.requiredCount = trigger.RequiredCount;
+    return obj;
+}
+
+function getObject(id) {
+    // console.log("id", id)
+    const objInfo = objGameData.Objects[id];
+    // console.log("object", objInfo)
+    const obj = {
+        id: id,
+        name: objInfo.Name,
+        price: objInfo.Price,
+        objInfo: objInfo,
+    }
+    return obj;
+}
+
+function getObjectsIds(tags) {
+    const tag = tags[0];
+    let cat = null;
+    if (tag.includes("category_")) {
+        cat = getCategoryId(tag);
+    }
+    const ids = [];
+    const objects = objGameData.Objects;
+    for (const objId in objects) {
+        const object = objects[objId];
+        const isInContext = object.ContextTags == null ? false : object.ContextTags.includes(tag);
+        // console.log(object.Category)
+        if (cat === object.Category || isInContext) {
+            ids.push(objId);
+        }
+    }
+    return ids;
+}
+
+function getCategoryId(catString) {
+    const categories = objGameData.Categories;
+    for (const cat of categories) {
+        if (catString === cat["context tag"]) {
+            return cat.value;
+        }
+    }
+}
+
+async function loadJsonFiles() {
+    let obj = {}
+
+    obj.BigCraftables = await loadJsonContent(JSON_URL_BC);
+    obj.Categories = await loadJson(JSON_URL_CATEGORIES);
+    obj.Colors = await loadJson(JSON_URL_COLORS);
+    obj.ItemTypes = await loadJson(JSON_URL_ITEM_TYPES);
+    obj.Machines = await loadJsonContent(JSON_URL_MACHINES);
+    obj.Objects = await loadJsonContent(JSON_URL_OBJECTS);
+    obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
+    obj.Quality = await loadJson(JSON_URL_QUALITY);
 
     return obj;
 }
