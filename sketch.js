@@ -2,13 +2,14 @@
 const TITLE = "Stardew Valley Thingie";
 const FILE_ID = "stardewFile";
 const JSON_URL_BC = "./Data/BigCraftables.json";
-const JSON_URL_CATEGORIES = "./Data/categories.json";
-const JSON_URL_COLORS = "./Data/colors.json"
-const JSON_URL_ITEM_TYPES = "./Data/item_types.json";
+const JSON_URL_FISH_POND = "./Data/FishPondData.json";
 const JSON_URL_MACHINES = "./Data/Machines.json";
 const JSON_URL_OBJECTS = "./Data/Objects.json";
-const JSON_URL_PROFESSIONS = "./Data/professions.json";
-const JSON_URL_QUALITY = "./Data/quality.json";
+const JSON_URL_CATEGORIES = "./Data/categories.json";
+// const JSON_URL_COLORS = "./Data/colors.json"
+// const JSON_URL_ITEM_TYPES = "./Data/item_types.json";
+// const JSON_URL_PROFESSIONS = "./Data/professions.json";
+// const JSON_URL_QUALITY = "./Data/quality.json";
 const BEAR_KNOWLEDGE_EVENT = "2120303";
 const SPRING_ONION_MASTERY_EVENT = "3910979";
 
@@ -23,23 +24,43 @@ function startup() {
     loadJsonFiles().then((data) => {
         objGameData = data;
         console.log(objGameData);
-        test();
         getMachineDetails();
     });
 }
 
-function test() {
-    const objects = objGameData.Objects;
-    const arr = [];
-    for(let id in objects){
-        const object = objects[id];
-        const contextTags = object.ContextTags;
-        if (contextTags && contextTags.includes('use_reverse_name_for_sorting')) {
-            arr.push(object)
-        }
-    }
-    console.log(arr)
+async function loadJsonFiles() {
+    let obj = {}
+
+    obj.BigCraftables = await loadJsonContent(JSON_URL_BC);
+    obj.Machines = await loadJsonContent(JSON_URL_MACHINES);
+    obj.Objects = await loadJsonContent(JSON_URL_OBJECTS);
+    // obj.FishPonds = await loadJsonContent(JSON_URL_FISH_POND);
+    obj.Categories = await loadJson(JSON_URL_CATEGORIES);
+    // obj.Colors = await loadJson(JSON_URL_COLORS);
+    // obj.ItemTypes = await loadJson(JSON_URL_ITEM_TYPES);
+    // obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
+    // obj.Quality = await loadJson(JSON_URL_QUALITY);
+
+    return obj;
 }
+
+async function loadJsonContent(url) {
+    let data = await loadJson(url);
+    return data.content;
+}
+
+// function test() {
+//     const objects = objGameData.Objects;
+//     const arr = [];
+//     for(let id in objects){
+//         const object = objects[id];
+//         const contextTags = object.ContextTags;
+//         if (contextTags && contextTags.includes('use_reverse_name_for_sorting')) {
+//             arr.push(object)
+//         }
+//     }
+//     console.log(arr)
+// }
 
 function getMachineDetails() {
     const bc = objGameData.BigCraftables;
@@ -50,97 +71,185 @@ function getMachineDetails() {
             console.log(bcName);
             const machineDetails = objGameData.Machines["(BC)" + id];
             const outputRules = machineDetails.OutputRules;
-            console.log(getOutputAndTriggers(outputRules))
+            machines[bcName] = getOutputAndTriggers(outputRules);
         }
     }
-    console.log(machines);
+    console.log("machines", machines);
 }
 
 function getOutputAndTriggers(outputRules) {
-    // console.log(outputRules)
-    for (let out of outputRules) {
-        const outTriggers = out.Triggers;
-        const outputItems = out.OutputItem;
-        console.log(out)
-        // console.log("triggers", outTriggers)
-        // console.log("output", outputItems)
-        const obj = {
-            triggers: []
-        };
-        for (const objTrigger of outTriggers) {
-            const triggers = getTriggers(objTrigger);
-            for (const tr of triggers) {
-                obj.triggers.push(tr);
-            }
-        }
-        for (const output of outputItems) {
-            getOutput(output);
-        }
-        console.log(obj)
-        console.log("----------------")
+    // console.log("output rules", outputRules);
+    const outputTriggers = [];
+
+    for (let rule of outputRules) {
+        console.log("rule", rule);
+        const obj = {};
+        const output = rule.OutputItem;
+        const triggers = rule.Triggers;
+
+        // console.log("output", output)
+
+        obj.triggers = processTriggers(triggers);
+
+        outputTriggers.push(obj);
+    }
+    return outputTriggers
+}
+
+function processTriggers(triggers) {
+    // console.log("triggers", triggers);
+    const processedTriggers = [];
+    for (let trigger of triggers) {
+        const obj = {};
+        obj.RequiredCount = trigger.RequiredCount;
+        obj.EligibleItems = getEligibleTriggers(trigger);
+
+        processedTriggers.push(obj);
+    }
+    return processedTriggers;
+}
+
+function getEligibleTriggers(trigger) {
+    console.log("trigger", trigger)
+    let id = null;
+    let object;
+    if (trigger.RequiredItemId != null) {
+        id = trigger.RequiredItemId.replace("(O)", "");
+        object = getObjectById(id);
+        console.log("object", object);
+    }
+    const specialObjects = {
+        "Roe": ["fish_has_roe"],
+        "Honey": ["flower_item", "!forage_item"]
+    };
+    const objectName = object ? object.Name : null;
+    let specialTags = specialObjects[objectName] ? specialObjects[objectName] : [];
+    if (trigger.RequiredTags != null || specialTags.length > 0) {
+        let tags = trigger.RequiredTags ? trigger.RequiredTags : [];
+        tags.push(...specialTags)
+        const triggerObjects = getObjectsByTag(tags);
+        console.log(">>>>", triggerObjects)
     }
 }
 
-function getOutput(output) {
-    console.log("O", output);
-
+function getObjectById(id) {
+    return objGameData.Objects[id];
 }
 
-function getTriggers(trigger) {
-    let reqId = trigger.RequiredItemId;
-    let objects = [];
-    if (reqId) {
-        reqId = reqId.replace("(O)", "");
-        objects.push(getTrigger(reqId, trigger));
-    } else {
-        let tags = trigger.RequiredTags
-        const objIds = getObjectsIds(tags);
-        for (const id of objIds) {
-            const obj = getTrigger(id, trigger);
-            obj.requiredCount = trigger.RequiredCount;
-            objects.push(obj);
+function getObjectsByTag(tagsList) {
+    // console.log("tags", tagsList);
+    let include = "";
+    let exclude = "";
+    for (const tag of tagsList) {
+        if (tag.includes("!")) {
+            exclude = tag.replace("!", "");
+        } else {
+            include = tag;
         }
     }
+    const objects = [];
+    let cat = null;
+    if (include.includes("category_")) cat = getCategoryId(include);
+    for (const objKey in objGameData.Objects) {
+        const object = objGameData.Objects[objKey];
+        if (object.Category == cat) {
+            objects.push(object);
+            continue;
+        }
+        const cts = object.ContextTags ? object.ContextTags : [];
+        if (cts.includes(include) && !cts.includes(exclude)) {
+            objects.push(object);
+            continue;
+        }
+    }
+
     return objects;
 }
 
-function getTrigger(id, trigger) {
-    const obj = getObject(id);
-    obj.requiredCount = trigger.RequiredCount;
-    return obj;
-}
+// function getOutputAndTriggers(outputRules) {
+//     // console.log(outputRules)
+//     for (let out of outputRules) {
+//         const outTriggers = out.Triggers;
+//         const outputItems = out.OutputItem;
+//         console.log(out)
+//         // console.log("triggers", outTriggers)
+//         // console.log("output", outputItems)
+//         const obj = {
+//             triggers: []
+//         };
+//         for (const objTrigger of outTriggers) {
+//             const triggers = getTriggers(objTrigger);
+//             for (const tr of triggers) {
+//                 obj.triggers.push(tr);
+//             }
+//         }
+//         for (const output of outputItems) {
+//             getOutput(output);
+//         }
+//         console.log(obj)
+//         console.log("----------------")
+//     }
+// }
 
-function getObject(id) {
-    // console.log("id", id)
-    const objInfo = objGameData.Objects[id];
-    // console.log("object", objInfo)
-    const obj = {
-        id: id,
-        name: objInfo.Name,
-        price: objInfo.Price,
-        objInfo: objInfo,
-    }
-    return obj;
-}
+// function getOutput(output) {
+//     console.log("O", output);
 
-function getObjectsIds(tags) {
-    const tag = tags[0];
-    let cat = null;
-    if (tag.includes("category_")) {
-        cat = getCategoryId(tag);
-    }
-    const ids = [];
-    const objects = objGameData.Objects;
-    for (const objId in objects) {
-        const object = objects[objId];
-        const isInContext = object.ContextTags == null ? false : object.ContextTags.includes(tag);
-        // console.log(object.Category)
-        if (cat === object.Category || isInContext) {
-            ids.push(objId);
-        }
-    }
-    return ids;
-}
+// }
+
+// function getTriggers(trigger) {
+//     let reqId = trigger.RequiredItemId;
+//     let objects = [];
+//     if (reqId) {
+//         reqId = reqId.replace("(O)", "");
+//         objects.push(getTrigger(reqId, trigger));
+//     } else {
+//         let tags = trigger.RequiredTags
+//         const objIds = getObjectsIds(tags);
+//         for (const id of objIds) {
+//             const obj = getTrigger(id, trigger);
+//             objects.push(obj);
+//         }
+//     }
+//     return objects;
+// }
+
+// function getTrigger(id, trigger) {
+//     const obj = getObject(id);
+//     obj.requiredCount = trigger.RequiredCount;
+//     return obj;
+// }
+
+// function getObject(id) {
+//     // console.log("id", id)
+//     const objInfo = objGameData.Objects[id];
+//     // console.log("object", objInfo)
+//     const obj = {
+//         id: id,
+//         name: objInfo.Name,
+//         price: objInfo.Price,
+//         objInfo: objInfo,
+//     }
+//     return obj;
+// }
+
+// function getObjectsIds(tags) {
+//     const tag = tags[0];
+//     let cat = null;
+//     if (tag.includes("category_")) {
+//         cat = getCategoryId(tag);
+//     }
+//     const ids = [];
+//     const objects = objGameData.Objects;
+//     for (const objId in objects) {
+//         const object = objects[objId];
+//         const isInContext = object.ContextTags == null ? false : object.ContextTags.includes(tag);
+//         // console.log(object.Category)
+//         if (cat === object.Category || isInContext) {
+//             ids.push(objId);
+//         }
+//     }
+//     return ids;
+// }
 
 function getCategoryId(catString) {
     const categories = objGameData.Categories;
@@ -149,26 +258,6 @@ function getCategoryId(catString) {
             return cat.value;
         }
     }
-}
-
-async function loadJsonFiles() {
-    let obj = {}
-
-    obj.BigCraftables = await loadJsonContent(JSON_URL_BC);
-    obj.Categories = await loadJson(JSON_URL_CATEGORIES);
-    obj.Colors = await loadJson(JSON_URL_COLORS);
-    obj.ItemTypes = await loadJson(JSON_URL_ITEM_TYPES);
-    obj.Machines = await loadJsonContent(JSON_URL_MACHINES);
-    obj.Objects = await loadJsonContent(JSON_URL_OBJECTS);
-    obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
-    obj.Quality = await loadJson(JSON_URL_QUALITY);
-
-    return obj;
-}
-
-async function loadJsonContent(url) {
-    let data = await loadJson(url);
-    return data.content;
 }
 
 function loadSaveFile(e) {
