@@ -66,27 +66,32 @@ function getMachineDetails() {
 
 function getOutputAndTriggers(outputRules) {
     console.log("output rules", outputRules);
-    const outputTriggers = [];
+    const outputTriggers = {};
 
     for (let rule of outputRules) {
         console.log("rule", rule);
+        const ruleId = rule.Id; // process this information with the output object name
         const obj = {};
         const output = rule.OutputItem;
         const triggers = rule.Triggers;
 
-        // console.log("output", output)
+        obj.Output = processOutput(output);
+        obj.Triggers = processTriggers(triggers);
 
-        obj.triggers = processTriggers(triggers);
-
-        outputTriggers.push(obj);
+        outputTriggers[ruleId] = obj;
     }
     return outputTriggers
+}
+
+function processOutput(output) {
+    console.log("output item", output[0]);
+    
 }
 
 function processTriggers(triggers) {
     const processedTriggers  = {
         RequiredCount: triggers[0].RequiredCount,
-        Triggers: getTriggers(triggers),
+        TriggersList: getTriggers(triggers),
     };
     return processedTriggers;
 }
