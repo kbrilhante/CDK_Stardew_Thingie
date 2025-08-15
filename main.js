@@ -48,7 +48,7 @@ function content() {
 
     const divFarmerPerks = createDiv(contentTag);
 
-    const txtFarmerTitle = document.createElement("h6");
+    const txtFarmerTitle = document.createElement("h5");
     txtFarmerTitle.textContent = "Farmer perks";
     divFarmerPerks.appendChild(txtFarmerTitle);
 
@@ -60,11 +60,16 @@ function content() {
 
     createCheckBox(fsProfessions, "Tiller (Lv 5)", "chkTiller");
     createCheckBox(fsProfessions, "Artisan (Lv 10)", "chkArtisan");
+
+    const fsSpecialPowers = createFieldSet(divFieldSets, "Special Items and Powers");
+
+    createCheckBox(fsSpecialPowers, "Bear's Knowledge", "chkBear");
+    createCheckBox(fsSpecialPowers, "Spring Onion Mastery", "chkSprOnion");
 }
 
 function createFieldSet(parent, legendText) {
     const div = document.createElement("div");
-    div.className = "col-auto";
+    div.className = "col";
     parent.appendChild(div);
     const fieldSet = document.createElement("fieldset");
     fieldSet.className = "border p-3 rounded";
@@ -90,6 +95,11 @@ function createCheckBox(parent, text, id) {
     lbl.htmlFor = id;
     lbl.textContent = text;
     div.appendChild(lbl);
+}
+
+function getChecked(id) {
+    const chk = document.getElementById(id);
+    return chk.checked;
 }
 
 function createDiv(parent) {
