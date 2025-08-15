@@ -22,7 +22,7 @@ function content() {
     inpFile.id = FILE_ID;
     inpFile.className = "form-control";
     divFile.appendChild(inpFile);
-    
+
     const txtInstructions = document.createElement("p");
     txtInstructions.textContent = "Use the full name of the farm as \"SaveGameInfo\" does not have all the information needed."
     txtInstructions.className = "fs-6 text-muted mb-0 mt-2";
@@ -35,7 +35,7 @@ function content() {
 
     const ulLocationsList = document.createElement("ul");
     divFile.appendChild(ulLocationsList);
-    
+
     const txtFileLocationWin = document.createElement("li");
     txtFileLocationWin.textContent = "Windows: %AppData%\\StardewValley\\Saves\\"
     txtFileLocationWin.className = "fs-6 text-muted";
@@ -47,16 +47,54 @@ function content() {
     ulLocationsList.appendChild(txtFileLocationMacLinux);
 
     const divFarmerPerks = createDiv(contentTag);
-    
 
+    const txtFarmerTitle = document.createElement("h6");
+    txtFarmerTitle.textContent = "Farmer perks";
+    divFarmerPerks.appendChild(txtFarmerTitle);
 
-    
+    const divFieldSets = document.createElement("div");
+    divFieldSets.className = "row"
+    divFarmerPerks.appendChild(divFieldSets);
+
+    const fsProfessions = createFieldSet(divFieldSets, "Professions");
+
+    createCheckBox(fsProfessions, "Tiller (Lv 5)", "chkTiller");
+    createCheckBox(fsProfessions, "Artisan (Lv 10)", "chkArtisan");
+}
+
+function createFieldSet(parent, legendText) {
+    const div = document.createElement("div");
+    div.className = "col-auto";
+    parent.appendChild(div);
+    const fieldSet = document.createElement("fieldset");
+    fieldSet.className = "border p-3 rounded";
+    div.appendChild(fieldSet);
+    const legend = document.createElement("legend");
+    legend.className = "w-auto px-2 fs-6";
+    legend.textContent = legendText;
+    fieldSet.appendChild(legend);
+    return fieldSet;
+}
+
+function createCheckBox(parent, text, id) {
+    const div = document.createElement("div");
+    div.className = "form-check";
+    parent.appendChild(div);
+    const chk = document.createElement("input");
+    chk.className = "form-check-input";
+    chk.type = "checkbox";
+    chk.id = id;
+    div.appendChild(chk);
+    const lbl = document.createElement("label");
+    lbl.className = "form-check-label";
+    lbl.htmlFor = id;
+    lbl.textContent = text;
+    div.appendChild(lbl);
 }
 
 function createDiv(parent) {
     const div = document.createElement("div");
-    div.className = "mb-3 my-2 border-bottom border-2";
+    div.className = "mb-3 my-2 border-bottom border-2 p-2";
     parent.appendChild(div);
-
     return div;
 }
