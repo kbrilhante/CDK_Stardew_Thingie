@@ -49,19 +49,6 @@ async function loadJsonContent(url) {
     return data.content;
 }
 
-// function test() {
-//     const objects = objGameData.Objects;
-//     const arr = [];
-//     for(let id in objects){
-//         const object = objects[id];
-//         const contextTags = object.ContextTags;
-//         if (contextTags && contextTags.includes('use_reverse_name_for_sorting')) {
-//             arr.push(object)
-//         }
-//     }
-//     console.log(arr)
-// }
-
 function getMachineDetails() {
     const bc = objGameData.BigCraftables;
     const machines = {};
@@ -74,15 +61,15 @@ function getMachineDetails() {
             machines[bcName] = getOutputAndTriggers(outputRules);
         }
     }
-    console.log("machines", machines);
+    // console.log("machines", machines);
 }
 
 function getOutputAndTriggers(outputRules) {
-    // console.log("output rules", outputRules);
+    console.log("output rules", outputRules);
     const outputTriggers = [];
 
     for (let rule of outputRules) {
-        console.log("rule", rule);
+        // console.log("rule", rule);
         const obj = {};
         const output = rule.OutputItem;
         const triggers = rule.Triggers;
@@ -99,72 +86,115 @@ function getOutputAndTriggers(outputRules) {
 function processTriggers(triggers) {
     // console.log("triggers", triggers);
     const processedTriggers = [];
-    for (let trigger of triggers) {
-        const obj = {};
-        obj.RequiredCount = trigger.RequiredCount;
-        obj.EligibleItems = getEligibleTriggers(trigger);
-
-        processedTriggers.push(obj);
-    }
+    const obj = {
+        RequiredCount: triggers[0].RequiredCount,
+    };
+    const allTriggers = getTriggers(triggers)
+    // console.log("all triggers", allTriggers);
+    // console.log("processed", obj);
     return processedTriggers;
 }
 
-function getEligibleTriggers(trigger) {
-    console.log("trigger", trigger)
-    let id = null;
-    let object;
-    if (trigger.RequiredItemId != null) {
-        id = trigger.RequiredItemId.replace("(O)", "");
-        object = getObjectById(id);
-        console.log("object", object);
+function getTriggers(triggers) {
+    const tr = [];
+    for (const trigger of triggers) {
+        // console.log(trigger.RequiredItemId)
+        // console.log(trigger.RequiredTags)
+        const id = trigger.RequiredItemId;
+        const requiredTags = trigger.RequiredTags ? trigger.RequiredTags : [];
+        if (id) {
+            const object = getObjectById(id.replace("(O)", ""));
+            if (requiredTags.includes('preserve_sheet_index_698')) {
+                const trProduct = getReverseProduct(object.Name, 698, 0.5, object.Price);
+                console.log(trProduct)
+            } else {
+                const objectInfo = processObject(object)
+                // console.log(objectInfo)
+            }
+
+        }
     }
-    const specialObjects = {
-        "Roe": ["fish_has_roe"],
-        "Honey": ["flower_item", "!forage_item"]
-    };
-    const objectName = object ? object.Name : null;
-    let specialTags = specialObjects[objectName] ? specialObjects[objectName] : [];
-    if (trigger.RequiredTags != null || specialTags.length > 0) {
-        let tags = trigger.RequiredTags ? trigger.RequiredTags : [];
-        tags.push(...specialTags)
-        const triggerObjects = getObjectsByTag(tags);
-        console.log(">>>>", triggerObjects)
+    return tr;
+}
+
+function processObject(object) {
+    // console.log(object)
+    const contextTags = object.ContextTags;
+    const objList = []
+    if (contextTags.includes('use_reverse_name_for_sorting')) {
+        getReverseProducts(object);
     }
+
+    return objList;
+}
+
+function getReverseProducts(object) {
+    const name = object.Name;
+    let childIds = [];
+    const products = [];
+    let multiplier;
+    const offset = object.Price;
+    switch (name) {
+        case "Honey":
+            childIds = getObjectsIds(["flower_item"], ["forage_item"]);
+            multiplier = 2;
+            products.push(getReverseProduct(name, 'Wild', multiplier, offset));
+            break;
+        case "Roe":
+            childIds = getObjectsIds(["fish_has_roe", "category_fish"])
+            multiplier = 0.5;
+            break;
+    }
+    for (const id of childIds) {
+        products.push(getReverseProduct(name, id, multiplier, offset));
+    }
+    console.log("prods", products)
+}
+
+function getReverseProduct(mainName, productId, multiplier, offset) {
+    const item = getObjectById(productId);
+    const name = item ? item.Name : productId;
+    const price = item ? item.Price : 0;
+    const obj = {
+        Name: `${name} ${mainName}`,
+        Price: calculatePrice(price, multiplier, offset),
+    }
+    return obj;
+}
+
+function calculatePrice(base, multiplier, offset = 0) {
+    return Math.floor(base * multiplier + offset);
 }
 
 function getObjectById(id) {
     return objGameData.Objects[id];
 }
 
-function getObjectsByTag(tagsList) {
-    // console.log("tags", tagsList);
-    let include = "";
-    let exclude = "";
-    for (const tag of tagsList) {
-        if (tag.includes("!")) {
-            exclude = tag.replace("!", "");
-        } else {
-            include = tag;
-        }
-    }
-    const objects = [];
+function getObjectsIds(tagsInclude=[], tagsExclude=[]) {
+    const ids = [];
     let cat = null;
-    if (include.includes("category_")) cat = getCategoryId(include);
-    for (const objKey in objGameData.Objects) {
-        const object = objGameData.Objects[objKey];
-        if (object.Category == cat) {
-            objects.push(object);
-            continue;
-        }
-        const cts = object.ContextTags ? object.ContextTags : [];
-        if (cts.includes(include) && !cts.includes(exclude)) {
-            objects.push(object);
-            continue;
+    for (let i = 0; i < tagsInclude.length; i++) {
+        const t = tagsInclude[i];
+        if (t.includes("category_")) {
+            cat = getCategoryId(t);
+            tagsInclude.splice(i, 1);
+            break;
         }
     }
-
-    return objects;
+    console.log("cat", cat);
+    console.log(tagsInclude, tagsExclude)
+    for (const objectId in objGameData.Objects) {
+        const object = objGameData.Objects[objectId];
+        const ct = object.ContextTags ? object.ContextTags : [];
+        let isFromCat = cat ? object.Category == cat : true;
+        if (includesAll(ct, tagsInclude) && !includesAny(ct, tagsExclude) && isFromCat) {
+            ids.push(objectId);
+        }
+    }
+    console.log("ids", ids)
+    return ids;
 }
+
 
 // function getOutputAndTriggers(outputRules) {
 //     // console.log(outputRules)
