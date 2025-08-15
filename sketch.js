@@ -61,7 +61,7 @@ function getMachineDetails() {
             machines[bcName] = getOutputAndTriggers(outputRules);
         }
     }
-    // console.log("machines", machines);
+    console.log("machines", machines);
 }
 
 function getOutputAndTriggers(outputRules) {
@@ -69,7 +69,7 @@ function getOutputAndTriggers(outputRules) {
     const outputTriggers = [];
 
     for (let rule of outputRules) {
-        // console.log("rule", rule);
+        console.log("rule", rule);
         const obj = {};
         const output = rule.OutputItem;
         const triggers = rule.Triggers;
@@ -84,51 +84,47 @@ function getOutputAndTriggers(outputRules) {
 }
 
 function processTriggers(triggers) {
-    // console.log("triggers", triggers);
-    const processedTriggers = [];
-    const obj = {
+    const processedTriggers  = {
         RequiredCount: triggers[0].RequiredCount,
+        Triggers: getTriggers(triggers),
     };
-    const allTriggers = getTriggers(triggers)
-    // console.log("all triggers", allTriggers);
-    // console.log("processed", obj);
     return processedTriggers;
 }
 
 function getTriggers(triggers) {
-    const tr = [];
+    let triggersList = [];
     for (const trigger of triggers) {
-        // console.log(trigger.RequiredItemId)
-        // console.log(trigger.RequiredTags)
-        const id = trigger.RequiredItemId;
+        const id = trigger.RequiredItemId ? trigger.RequiredItemId.replace("(O)", "") : null;
         const requiredTags = trigger.RequiredTags ? trigger.RequiredTags : [];
         if (id) {
-            const object = getObjectById(id.replace("(O)", ""));
-            if (requiredTags.includes('preserve_sheet_index_698')) {
-                const trProduct = getReverseProduct(object.Name, 698, 0.5, object.Price);
-                console.log(trProduct)
-            } else {
-                const objectInfo = processObject(object)
-                // console.log(objectInfo)
-            }
-
+            triggersList = processObjectById(id, requiredTags);
+            continue;
         }
+        triggersList.push(...processObjectByTags(requiredTags))
     }
-    return tr;
+    return triggersList;
 }
 
-function processObject(object) {
-    // console.log(object)
+function processObjectByTags(requiredTags) {
+    const ids = getObjectsIds(requiredTags)
+    const objects = [];
+    for (const id of ids) {
+        const obj = getObjectById(id)
+        objects.push(formatTrigger(obj.Name, obj.Price));
+    }
+    return objects;
+}
+
+function processObjectById(id, requiredTags = []) {
+    const object = getObjectById(id);
     const contextTags = object.ContextTags;
-    const objList = []
     if (contextTags.includes('use_reverse_name_for_sorting')) {
-        getReverseProducts(object);
+        return getReverseProducts(object, requiredTags);
     }
-
-    return objList;
+    return [formatTrigger(object.Name, object.Price)];
 }
 
-function getReverseProducts(object) {
+function getReverseProducts(object, requiredTags = []) {
     const name = object.Name;
     let childIds = [];
     const products = [];
@@ -138,26 +134,36 @@ function getReverseProducts(object) {
         case "Honey":
             childIds = getObjectsIds(["flower_item"], ["forage_item"]);
             multiplier = 2;
-            products.push(getReverseProduct(name, 'Wild', multiplier, offset));
+            products.push(formatTrigger(`Wild ${name}`, calculatePrice(0, multiplier, offset)));
             break;
         case "Roe":
-            childIds = getObjectsIds(["fish_has_roe", "category_fish"])
+            const sturgeonId = 698;
+            if (requiredTags.includes('preserve_sheet_index_698')) {
+                childIds = [sturgeonId]
+            } else {
+                childIds = getObjectsIds(["fish_has_roe", "category_fish"])
+                childIds.splice(childIds.indexOf(sturgeonId), 1);
+            }
             multiplier = 0.5;
             break;
     }
     for (const id of childIds) {
         products.push(getReverseProduct(name, id, multiplier, offset));
     }
-    console.log("prods", products)
+    return products;
 }
 
 function getReverseProduct(mainName, productId, multiplier, offset) {
-    const item = getObjectById(productId);
-    const name = item ? item.Name : productId;
-    const price = item ? item.Price : 0;
+    const object = getObjectById(productId);
+    const objectName = `${object.Name} ${mainName}`;
+    const objectPrice = calculatePrice(object.Price, multiplier, offset);
+    return formatTrigger(objectName, objectPrice);
+}
+
+function formatTrigger(name, price) {
     const obj = {
-        Name: `${name} ${mainName}`,
-        Price: calculatePrice(price, multiplier, offset),
+        Name: name,
+        price: price
     }
     return obj;
 }
@@ -170,7 +176,7 @@ function getObjectById(id) {
     return objGameData.Objects[id];
 }
 
-function getObjectsIds(tagsInclude=[], tagsExclude=[]) {
+function getObjectsIds(tagsInclude = [], tagsExclude = []) {
     const ids = [];
     let cat = null;
     for (let i = 0; i < tagsInclude.length; i++) {
@@ -181,8 +187,6 @@ function getObjectsIds(tagsInclude=[], tagsExclude=[]) {
             break;
         }
     }
-    console.log("cat", cat);
-    console.log(tagsInclude, tagsExclude)
     for (const objectId in objGameData.Objects) {
         const object = objGameData.Objects[objectId];
         const ct = object.ContextTags ? object.ContextTags : [];
@@ -191,7 +195,6 @@ function getObjectsIds(tagsInclude=[], tagsExclude=[]) {
             ids.push(objectId);
         }
     }
-    console.log("ids", ids)
     return ids;
 }
 
