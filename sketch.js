@@ -1,11 +1,12 @@
 // constants
 const TITLE = "Stardew Valley Thingie";
 const FILE_ID = "stardewFile";
-const JSON_URL_BC = "./Data/BigCraftables.json";
-const JSON_URL_FISH_POND = "./Data/FishPondData.json";
-const JSON_URL_MACHINES = "./Data/Machines.json";
-const JSON_URL_OBJECTS = "./Data/Objects.json";
-const JSON_URL_CATEGORIES = "./Data/categories.json";
+const JSON_URL_BC = "./gameData/Data/BigCraftables.json";
+// const JSON_URL_FISH_POND = "./Data/FishPondData.json";
+const JSON_URL_MACHINES = "./gameData/Data/Machines.json";
+const JSON_URL_OBJECTS = "./gameData/Data/Objects.json";
+const JSON_URL_STRINGS_OBJECTS = "./gameData/Strings/Objects.json";
+const JSON_URL_CATEGORIES = "./gameData/categories.json";
 // const JSON_URL_COLORS = "./Data/colors.json"
 // const JSON_URL_ITEM_TYPES = "./Data/item_types.json";
 // const JSON_URL_PROFESSIONS = "./Data/professions.json";
@@ -31,9 +32,10 @@ function startup() {
 async function loadJsonFiles() {
     let obj = {}
 
-    obj.BigCraftables = await loadJsonContent(JSON_URL_BC);
-    obj.Machines = await loadJsonContent(JSON_URL_MACHINES);
-    obj.Objects = await loadJsonContent(JSON_URL_OBJECTS);
+    obj.BigCraftables = await loadJson(JSON_URL_BC);
+    obj.Machines = await loadJson(JSON_URL_MACHINES);
+    obj.Objects = await loadJson(JSON_URL_OBJECTS);
+    obj.Strings = await loadJson(JSON_URL_STRINGS_OBJECTS);
     // obj.FishPonds = await loadJsonContent(JSON_URL_FISH_POND);
     obj.Categories = await loadJson(JSON_URL_CATEGORIES);
     // obj.Colors = await loadJson(JSON_URL_COLORS);
