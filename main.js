@@ -46,8 +46,10 @@ function content() {
     txtFileLocationMacLinux.className = "fs-6 text-muted";
     ulLocationsList.appendChild(txtFileLocationMacLinux);
 
-    const divOptions = createDiv(contentTag);
+    const divFarmerPerks = createDiv(contentTag);
     
+
+
     
 }
 
