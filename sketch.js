@@ -65,13 +65,16 @@ function getMachineDetails() {
 }
 
 function getOutputAndTriggers(outputRules) {
-    console.log("output rules", outputRules);
+    // console.log("output rules", outputRules);
     const outputTriggers = {};
 
     for (let rule of outputRules) {
-        console.log("rule", rule);
+        console.log("rule", rule.Id);
         const ruleId = rule.Id; // process this information with the output object name
-        const obj = {};
+        const obj = {
+            DaysUntilReady: rule.DaysUntilReady,
+            MinutesUntilReady: rule.MinutesUntilReady,
+        };
         const output = rule.OutputItem;
         const triggers = rule.Triggers;
 
@@ -84,8 +87,14 @@ function getOutputAndTriggers(outputRules) {
 }
 
 function processOutput(output) {
-    console.log("output item", output[0]);
-    
+    if (Array.isArray(output)) output = output[0];
+    console.log("output item", output);
+    const id = output.Id;
+    const itemId = output.ItemId.split(" ");
+    console.log(">>>>", id, "|", itemId);
+    console.log()
+    // todo: filter information
+    // "DisplayName": "[LocalizedText Strings\\Objects:Jelly_Name]",
 }
 
 function processTriggers(triggers) {
