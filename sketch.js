@@ -13,7 +13,7 @@ const JSON_URL_PROFESSIONS = "./gameData/professions.json";
 const BEAR_KNOWLEDGE_EVENT = "2120303";
 const SPRING_ONION_MASTERY_EVENT = "3910979";
 
-const MACHINES = ["Preserves Jar", "Keg", "Dehydrator"];
+const MACHINES = ["Dehydrator", "Keg", "Preserves Jar"];
 
 // global variables
 let objGameData;
@@ -279,12 +279,15 @@ function loadSaveFile(e) {
 
 function handleSaveFile(saveObj) {
     saveFileData = {};
-    let inventory = {};
 
     console.log(saveObj)
 
     const allItems = sortItemsByLocation(saveObj);
-    inventory = getChests(allItems);
+    console.log("all items", allItems)
+    let machines = getMachines(allItems);
+    saveFileData.machines = machines;
+
+    let inventory = getChests(allItems);
 
     const player = saveObj.player;
 
@@ -294,15 +297,13 @@ function handleSaveFile(saveObj) {
 
     saveFileData.Inventory = inventory;
 
-    const playerProfessions = getPlayerProfessions(player)
+    const playerProfessions = getPlayerProfessions(player);
     const tillerId = getProfession("Tiller");
     saveFileData.IsTiller = playerProfessions.includes(tillerId);
     const artisanId = getProfession("Artisan");
     saveFileData.IsArtisan = playerProfessions.includes(artisanId);
     saveFileData.HasBearPaw = hasEventHappened(player, BEAR_KNOWLEDGE_EVENT);
     saveFileData.HasSpringOnionMastery = hasEventHappened(player, SPRING_ONION_MASTERY_EVENT);
-
-
 
     console.log("save file", saveFileData);
     fillPlayerInfo();
@@ -339,6 +340,33 @@ function getProfession(profession) {
         }
     }
     return null;
+}
+
+function getMachines(allItems) {
+    const machines = {};
+    for (const machine of MACHINES) {
+        let totalAmount = 0;
+        machines[machine] = {}
+        for (const location in allItems) {
+            let amount = 0;
+            let readyForHarvest = 0;
+            const items = allItems[location];
+            for (const item of items) {
+                const itemName = item.info.name["#text"];
+                if (itemName === machine) {
+                    amount++;
+                    if (item.info.readyForHarvest["#text"] == "true") readyForHarvest++;
+                };
+            }
+            totalAmount += amount;
+            if (amount > 0) machines[machine][location] = {
+                amount: amount,
+                readyForHarvest: readyForHarvest,
+            }
+        }
+        machines[machine].totalAmount = totalAmount;
+    }
+    return machines;
 }
 
 function getChests(allItems) {
@@ -424,9 +452,13 @@ function getItemInfo(item) {
     return obj;
 }
 
-function fillPlayerInfo() { 
+function fillPlayerInfo() {
     fillCheckBox("chkTiller", saveFileData.IsTiller);
     fillCheckBox("chkArtisan", saveFileData.IsArtisan);
     fillCheckBox("chkBear", saveFileData.HasBearPaw);
     fillCheckBox("chkSprOnion", saveFileData.HasSpringOnionMastery);
+    for (const machine in saveFileData.machines) {
+        const value = saveFileData.machines[machine].totalAmount
+        setInputValue(`inp${machine}`, value);
+    }
 }

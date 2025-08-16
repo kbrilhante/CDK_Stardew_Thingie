@@ -62,9 +62,15 @@ function content() {
     createCheckBox(fsProfessions, "Artisan (Lv 10)", "chkArtisan");
 
     const fsSpecialPowers = createFieldSet(divFieldSets, "Special Items and Powers");
-
+    
     createCheckBox(fsSpecialPowers, "Bear's Knowledge", "chkBear");
     createCheckBox(fsSpecialPowers, "Spring Onion Mastery", "chkSprOnion");
+    
+    const fsMachines = createFieldSet(divFieldSets, "Machinery");
+    for (const machine of MACHINES) {
+        createNumberInput(fsMachines, machine);
+    }
+
 }
 
 function createFieldSet(parent, legendText) {
@@ -81,20 +87,47 @@ function createFieldSet(parent, legendText) {
     return fieldSet;
 }
 
-function createCheckBox(parent, text, id) {
+function createFormDiv(parent) {
     const div = document.createElement("div");
     div.className = "form-check";
     parent.appendChild(div);
+    return div;
+}
+
+function createFormLabel(parent, htmlFor, text) {
+    const lbl = document.createElement("label");
+    lbl.className = "form-label";
+    lbl.htmlFor = htmlFor;
+    lbl.textContent = text;
+    parent.appendChild(lbl);
+    return lbl;
+}
+
+function createNumberInput(parent, txtLabel) {
+    const id = `inp${txtLabel}`;
+    const div = createFormDiv(parent);
+    div.className = "input-group py-1";
+    const span = document.createElement("span");
+    span.className = "input-group-text";
+    span.textContent = txtLabel;
+    div.appendChild(span);
+    const inpNumber = document.createElement("input");
+    inpNumber.type = "number";
+    inpNumber.className = "form-control";
+    inpNumber.id = id;
+    inpNumber.value = 0;
+    div.appendChild(inpNumber);
+}
+
+function createCheckBox(parent, text, id) {
+    const div = createFormDiv(parent);
     const chk = document.createElement("input");
     chk.className = "form-check-input";
     chk.type = "checkbox";
     chk.id = id;
     div.appendChild(chk);
-    const lbl = document.createElement("label");
+    const lbl = createFormLabel(div, id, text);
     lbl.className = "form-check-label";
-    lbl.htmlFor = id;
-    lbl.textContent = text;
-    div.appendChild(lbl);
 }
 
 function getChecked(id) {
@@ -111,4 +144,12 @@ function createDiv(parent) {
     div.className = "mb-3 my-2 border-bottom border-2 p-2";
     parent.appendChild(div);
     return div;
+}
+
+function setInputValue(id, value) {
+    document.getElementById(id).value = value;
+}
+
+function getInputValue(id) {
+    return document.getElementById(id).value;
 }
