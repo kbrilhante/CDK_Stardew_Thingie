@@ -58,17 +58,17 @@ function content() {
 
     const fsProfessions = createFieldSet(divFieldSets, "Professions");
 
-    createCheckBox(fsProfessions, "Tiller (Lv 5)", "chkTiller");
-    createCheckBox(fsProfessions, "Artisan (Lv 10)", "chkArtisan");
+    createCheckBox(fsProfessions, "chkTiller", "Tiller (Lv 5)");
+    createCheckBox(fsProfessions, "chkArtisan", "Artisan (Lv 10)");
 
     const fsSpecialPowers = createFieldSet(divFieldSets, "Special Items and Powers");
-    
-    createCheckBox(fsSpecialPowers, "Bear's Knowledge", "chkBear");
-    createCheckBox(fsSpecialPowers, "Spring Onion Mastery", "chkSprOnion");
-    
+
+    createCheckBox(fsSpecialPowers, "chkBear", "Bear's Knowledge");
+    createCheckBox(fsSpecialPowers, "chkSprOnion", "Spring Onion Mastery");
+
     const fsMachines = createFieldSet(divFieldSets, "Machinery");
     for (const machine of MACHINES) {
-        createNumberInput(fsMachines, machine);
+        createMachineInput(fsMachines, machine);
     }
 
 }
@@ -103,31 +103,39 @@ function createFormLabel(parent, htmlFor, text) {
     return lbl;
 }
 
-function createNumberInput(parent, txtLabel) {
-    const id = `inp${txtLabel}`;
+function createMachineInput(parent, txtLabel) {
     const div = createFormDiv(parent);
-    div.className = "input-group py-1";
+    div.className = "input-group mb-3";
+
+    const chk = createCheckBox(div, `chk${txtLabel}`);
+    chk.checked = true;
+    chk.onchange = toggleMachine;
+
     const span = document.createElement("span");
     span.className = "input-group-text";
     span.textContent = txtLabel;
     div.appendChild(span);
+
     const inpNumber = document.createElement("input");
     inpNumber.type = "number";
     inpNumber.className = "form-control";
-    inpNumber.id = id;
+    inpNumber.id = `inp${txtLabel}`;
     inpNumber.value = 0;
     div.appendChild(inpNumber);
 }
 
-function createCheckBox(parent, text, id) {
+function createCheckBox(parent, id, text="") {
     const div = createFormDiv(parent);
     const chk = document.createElement("input");
     chk.className = "form-check-input";
     chk.type = "checkbox";
     chk.id = id;
     div.appendChild(chk);
-    const lbl = createFormLabel(div, id, text);
-    lbl.className = "form-check-label";
+    if (text) {
+        const lbl = createFormLabel(div, id, text);
+        lbl.className = "form-check-label";
+    }
+    return chk;
 }
 
 function getChecked(id) {

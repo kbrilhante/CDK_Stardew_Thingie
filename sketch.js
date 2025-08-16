@@ -25,7 +25,7 @@ function startup() {
 
     loadJsonFiles().then((data) => {
         objGameData = data;
-        console.log(objGameData);
+        console.log("game data", objGameData);
         getMachineDetails();
     });
 }
@@ -58,7 +58,26 @@ function getMachineDetails() {
         }
     }
     machinesData = machines;
+    groupAllMachineTriggers();
     console.log("machines", machinesData);
+}
+
+function groupAllMachineTriggers() {
+    let allTriggers = new Set();
+    for (const machine in machinesData) {
+        const machineValue = machinesData[machine];
+        let allMachineTriggers = new Set();
+        for (const product in machineValue) {
+            const triggers = machineValue[product].Triggers.TriggersList;
+            for (const trigger of triggers) {
+                const triggerName = trigger.Name;
+                allTriggers.add(triggerName);
+                allMachineTriggers.add(triggerName);
+            }
+        }
+        machineValue.AllTriggers = setToArray(allMachineTriggers);
+    }
+    machinesData.AllTriggers = setToArray(allTriggers);
 }
 
 function getOutputAndTriggers(outputRules) {
@@ -377,7 +396,12 @@ function getChests(allItems) {
         for (const item of items) {
             if (item.xsiType === "Chest") {
                 item.items = getChestItems(item.info);
+                if (item.items.length == 0) continue;
                 item.playerChoiceColor = item.info.playerChoiceColor;
+                item.location = {
+                    X: item.info.boundingBox.X["#text"],
+                    Y: item.info.boundingBox.Y["#text"],
+                };
                 delete item.info;
                 arrChests.push(item);
             }
@@ -396,8 +420,10 @@ function getChestItems(chest) {
     if (!Array.isArray(items)) items = [items];
     for (const item of items) {
         if (!item.name) continue;
+        const name = item.name["#text"];
+        if (!machinesData.AllTriggers.includes(name)) continue;
         const chestItem = {
-            name: item.name["#text"],
+            name: name,
             itemId: item.itemId["#text"],
         };
         chestItem.item = item ? item : null
@@ -405,7 +431,6 @@ function getChestItems(chest) {
         chestItem.quality = item.quality ? item.quality["#text"] : null;
         chestItem.type = item.type ? item.type["#text"] : null;
         chestItem.stack = item.stack ? item.stack["#text"] : null;
-
         chestItems.push(chestItem);
     }
     return chestItems;
@@ -427,12 +452,9 @@ function sortItemsByLocation(saveObj) {
 
 function getItemsCollection(items) {
     let arrItems = [];
-    if (Array.isArray(items)) {
-        for (let item of items) {
-            arrItems.push(getItemInfo(item));
-        }
-    } else {
-        arrItems.push(getItemInfo(items));
+    if (!Array.isArray(items)) items = [items];
+    for (let item of items) {
+        arrItems.push(getItemInfo(item));
     }
     return arrItems;
 }
@@ -461,4 +483,9 @@ function fillPlayerInfo() {
         const value = saveFileData.machines[machine].totalAmount
         setInputValue(`inp${machine}`, value);
     }
+}
+
+function toggleMachine(e) {
+    console.log(e.target.id.replace("chk", ""));
+    console.log(e.target.checked);
 }
