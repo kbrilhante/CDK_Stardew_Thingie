@@ -37,12 +37,12 @@ function content() {
     divFile.appendChild(ulLocationsList);
 
     const txtFileLocationWin = document.createElement("li");
-    txtFileLocationWin.textContent = "Windows: %AppData%\\StardewValley\\Saves\\"
+    txtFileLocationWin.textContent = "Windows: %AppData%\\StardewValley\\Saves\\";
     txtFileLocationWin.className = "fs-6 text-muted";
     ulLocationsList.appendChild(txtFileLocationWin);
 
     const txtFileLocationMacLinux = document.createElement("li");
-    txtFileLocationMacLinux.textContent = "Mac OSX & Linux: ~/.config/StardewValley/Saves/"
+    txtFileLocationMacLinux.textContent = "Mac OSX & Linux: ~/.config/StardewValley/Saves/";
     txtFileLocationMacLinux.className = "fs-6 text-muted";
     ulLocationsList.appendChild(txtFileLocationMacLinux);
 
@@ -53,7 +53,7 @@ function content() {
     divFarmerPerks.appendChild(txtFarmerTitle);
 
     const divFieldSets = document.createElement("div");
-    divFieldSets.className = "row"
+    divFieldSets.className = "row pb-2";
     divFarmerPerks.appendChild(divFieldSets);
 
     const fsProfessions = createFieldSet(divFieldSets, "Professions");
