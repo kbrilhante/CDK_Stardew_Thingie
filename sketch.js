@@ -287,7 +287,7 @@ function handleSaveFile(saveObj) {
     inventory = getChests(allItems);
 
     const player = saveObj.player;
-    
+
     console.log("player", player)
     const playerInventory = getChestItems(player);
     inventory.PlayerInventory = playerInventory;
@@ -309,7 +309,9 @@ function handleSaveFile(saveObj) {
 }
 
 function hasEventHappened(player, eventId) {
-    for (const event of player.eventsSeen.int) {
+    let events = player.eventsSeen.int;
+    if (!Array.isArray(events)) events = [events];
+    for (const event of events) {
         if (Object.values(event).includes(eventId)) {
             return true;
         }
@@ -317,8 +319,11 @@ function hasEventHappened(player, eventId) {
     return false;
 }
 
+
+
 function getPlayerProfessions(player) {
     const professions = [];
+    if (Object.keys(player.professions).length == 0) return professions;
     for (const prof of player.professions.int) {
         professions.push(...Object.values(prof))
     }
