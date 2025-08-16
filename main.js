@@ -49,7 +49,7 @@ function content() {
     const divFarmerPerks = createDiv(contentTag);
 
     const txtFarmerTitle = document.createElement("h5");
-    txtFarmerTitle.textContent = "Farmer perks";
+    txtFarmerTitle.textContent = "Save State Details";
     divFarmerPerks.appendChild(txtFarmerTitle);
 
     const divFieldSets = document.createElement("div");
@@ -60,7 +60,7 @@ function content() {
     divFieldSets.classList.add("pb-2");
     divFarmerPerks.appendChild(divFieldSets);
 
-    const fsProfessions = createFieldSet(divFieldSets, "Professions");
+    const fsProfessions = createFieldSet(divFieldSets, "Farmer Professions");
 
     createCheckBox(fsProfessions, "chkTiller", "Tiller (Lv 5)");
     createCheckBox(fsProfessions, "chkArtisan", "Artisan (Lv 10)");
