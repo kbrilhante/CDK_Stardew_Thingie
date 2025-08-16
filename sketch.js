@@ -296,16 +296,15 @@ function handleSaveFile(saveObj) {
     const playerProfessions = getPlayerProfessions(player)
     const tillerId = getProfession("Tiller");
     saveFileData.IsTiller = playerProfessions.includes(tillerId);
-
     const artisanId = getProfession("Artisan");
     saveFileData.IsArtisan = playerProfessions.includes(artisanId);
-
     saveFileData.HasBearPaw = hasEventHappened(player, BEAR_KNOWLEDGE_EVENT);
     saveFileData.HasSpringOnionMastery = hasEventHappened(player, SPRING_ONION_MASTERY_EVENT);
 
 
 
-    console.log("save file", saveFileData)
+    console.log("save file", saveFileData);
+    fillPlayerInfo();
 }
 
 function hasEventHappened(player, eventId) {
@@ -417,4 +416,11 @@ function getItemInfo(item) {
     obj.itemId = info.itemId["#text"];
     obj.info = info;
     return obj;
+}
+
+function fillPlayerInfo() { 
+    fillCheckBox("chkTiller", saveFileData.IsTiller);
+    fillCheckBox("chkArtisan", saveFileData.IsArtisan);
+    fillCheckBox("chkBear", saveFileData.HasBearPaw);
+    fillCheckBox("chkSprOnion", saveFileData.HasSpringOnionMastery);
 }

@@ -102,6 +102,10 @@ function getChecked(id) {
     return chk.checked;
 }
 
+function fillCheckBox(id, value) {
+    document.getElementById(id).checked = value;
+}
+
 function createDiv(parent) {
     const div = document.createElement("div");
     div.className = "mb-3 my-2 border-bottom border-2 p-2";
