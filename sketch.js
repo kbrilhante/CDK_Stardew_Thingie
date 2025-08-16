@@ -6,9 +6,9 @@ const JSON_URL_MACHINES = "./gameData/Data/Machines.json";
 const JSON_URL_OBJECTS = "./gameData/Data/Objects.json";
 const JSON_URL_STRINGS_OBJECTS = "./gameData/Strings/Objects.json";
 const JSON_URL_CATEGORIES = "./gameData/categories.json";
+const JSON_URL_PROFESSIONS = "./gameData/professions.json";
 // const JSON_URL_COLORS = "./Data/colors.json"
 // const JSON_URL_ITEM_TYPES = "./Data/item_types.json";
-// const JSON_URL_PROFESSIONS = "./Data/professions.json";
 // const JSON_URL_QUALITY = "./Data/quality.json";
 const BEAR_KNOWLEDGE_EVENT = "2120303";
 const SPRING_ONION_MASTERY_EVENT = "3910979";
@@ -17,6 +17,8 @@ const MACHINES = ["Preserves Jar", "Keg", "Dehydrator"];
 
 // global variables
 let objGameData;
+let machinesData;
+let saveFileData;
 
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
@@ -36,9 +38,9 @@ async function loadJsonFiles() {
     obj.Objects = await loadJson(JSON_URL_OBJECTS);
     obj.Strings = await loadJson(JSON_URL_STRINGS_OBJECTS);
     obj.Categories = await loadJson(JSON_URL_CATEGORIES);
+    obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
     // obj.Colors = await loadJson(JSON_URL_COLORS);
     // obj.ItemTypes = await loadJson(JSON_URL_ITEM_TYPES);
-    // obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
     // obj.Quality = await loadJson(JSON_URL_QUALITY);
 
     return obj;
@@ -50,20 +52,19 @@ function getMachineDetails() {
     for (const id in bc) {
         const bcName = bc[id].Name;
         if (MACHINES.includes(bcName)) {
-            console.log(bcName);
             const machineDetails = objGameData.Machines["(BC)" + id];
             const outputRules = machineDetails.OutputRules;
             machines[bcName] = getOutputAndTriggers(outputRules);
         }
     }
-    console.log("machines", machines);
+    machinesData = machines;
+    console.log("machines", machinesData);
 }
 
 function getOutputAndTriggers(outputRules) {
     const outputTriggers = {};
 
     for (let rule of outputRules) {
-        console.log("rule", rule.Id);
         const obj = {
             DaysUntilReady: rule.DaysUntilReady,
             MinutesUntilReady: rule.MinutesUntilReady,
@@ -71,12 +72,8 @@ function getOutputAndTriggers(outputRules) {
         const output = rule.OutputItem[0];
         const triggers = rule.Triggers;
 
-        console.log("output item", output);
-
         obj.Output = processOutput(output.Id, output.ItemId);
         obj.Triggers = processTriggers(triggers);
-
-        console.log("object", obj)
 
         const ruleId = obj.Output.Name.replaceAll(" ", "");
 
@@ -243,7 +240,7 @@ function getObjectsIds(tagsInclude = [], tagsExclude = []) {
 function getObjectIdByName(name) {
     name = `[LocalizedText Strings\\Objects:${name}_Name]`
     let id = Object.entries(objGameData.Objects).filter(([id, object]) => object.DisplayName === name)
-    while(Array.isArray(id)) {
+    while (Array.isArray(id)) {
         id = id[0];
     }
     return id
@@ -269,9 +266,6 @@ function loadSaveFile(e) {
 
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(contents, "application/xml");
-
-        // console.log(xmlDoc)
-
         const saveFile = xmlToJson(xmlDoc.documentElement);
         handleSaveFile(saveFile);
     }
@@ -284,6 +278,7 @@ function loadSaveFile(e) {
 }
 
 function handleSaveFile(saveObj) {
+    saveFileData = {};
     let inventory = {};
 
     console.log(saveObj)
@@ -294,8 +289,51 @@ function handleSaveFile(saveObj) {
     const player = saveObj.player;
     console.log("player", player)
     const playerInventory = getChestItems(player);
-    inventory["PlayerInventory"] = playerInventory;
-    console.log(inventory)
+    inventory.PlayerInventory = playerInventory;
+
+    saveFileData.Inventory = inventory;
+
+    const playerProfessions = getPlayerProfessions(player)
+    const tillerId = getProfession("Tiller");
+    saveFileData.IsTiller = playerProfessions.includes(tillerId);
+
+    const artisanId = getProfession("Artisan");
+    saveFileData.IsArtisan = playerProfessions.includes(artisanId);
+
+    saveFileData.HasBearPaw = hasEventHappened(player, BEAR_KNOWLEDGE_EVENT);
+    saveFileData.HasSpringOnionMastery = hasEventHappened(player, SPRING_ONION_MASTERY_EVENT);
+
+
+
+    console.log("save file", saveFileData)
+}
+
+function hasEventHappened(player, eventId) {
+    for (const event of player.eventsSeen.int) {
+        if (Object.values(event).includes(eventId)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getPlayerProfessions(player) {
+    const professions = [];
+    for (const prof of player.professions.int) {
+        professions.push(...Object.values(prof))
+    }
+    return professions;
+}
+
+function getProfession(profession) {
+    const professions = objGameData.Professions
+    for (const id in professions) {
+        const value = professions[id];
+        if (profession === value) {
+            return id;
+        }
+    }
+    return null;
 }
 
 function getChests(allItems) {
@@ -319,9 +357,10 @@ function getChests(allItems) {
 }
 
 function getChestItems(chest) {
-    const items = chest.items.Item;
+    let items = chest.items.Item;
     if (!items) return [];
     const chestItems = [];
+    if (!Array.isArray(items)) items = [items];
     for (const item of items) {
         if (!item.name) continue;
         const chestItem = {
@@ -370,6 +409,9 @@ function getItemInfo(item) {
     const obj = {};
     if (info["@attributes"]) {
         obj.xsiType = info["@attributes"]["xsi:type"]
+    }
+    if (info.specialChestType) {
+        obj.specialChestType = info.specialChestType["#text"];
     }
     obj.name = info.name["#text"];
     obj.itemId = info.itemId["#text"];
