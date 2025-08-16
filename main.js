@@ -53,7 +53,11 @@ function content() {
     divFarmerPerks.appendChild(txtFarmerTitle);
 
     const divFieldSets = document.createElement("div");
-    divFieldSets.className = "row pb-2";
+    divFieldSets.classList.add("row");
+    divFieldSets.classList.add("row-cols-1");
+    divFieldSets.classList.add("row-cols-sm-2");
+    divFieldSets.classList.add("row-cols-lg-3");
+    divFieldSets.classList.add("pb-2");
     divFarmerPerks.appendChild(divFieldSets);
 
     const fsProfessions = createFieldSet(divFieldSets, "Professions");
@@ -75,7 +79,7 @@ function content() {
 
 function createFieldSet(parent, legendText) {
     const div = document.createElement("div");
-    div.className = "col";
+    div.className = "col mb-2";
     parent.appendChild(div);
     const fieldSet = document.createElement("fieldset");
     fieldSet.className = "border p-3 rounded";
