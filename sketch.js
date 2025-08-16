@@ -287,6 +287,7 @@ function handleSaveFile(saveObj) {
     inventory = getChests(allItems);
 
     const player = saveObj.player;
+    
     console.log("player", player)
     const playerInventory = getChestItems(player);
     inventory.PlayerInventory = playerInventory;
