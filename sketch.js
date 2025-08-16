@@ -47,13 +47,13 @@ async function loadJsonFiles() {
 }
 
 function getMachineDetails() {
-    const bc = objGameData.BigCraftables;
+    const bc = {...objGameData.BigCraftables};
     const machines = {};
     for (const id in bc) {
         const bcName = bc[id].Name;
         if (MACHINES.includes(bcName)) {
             const machineDetails = objGameData.Machines["(BC)" + id];
-            const outputRules = machineDetails.OutputRules;
+            let outputRules = [...machineDetails.OutputRules];
             machines[bcName] = getOutputAndTriggers(outputRules);
         }
     }
@@ -90,12 +90,12 @@ function getOutputAndTriggers(outputRules) {
         };
         const output = rule.OutputItem[0];
         const triggers = rule.Triggers;
-
+        
         obj.Output = processOutput(output.Id, output.ItemId);
         obj.Triggers = processTriggers(triggers);
-
+        
         const ruleId = obj.Output.Name.replaceAll(" ", "");
-
+        
         outputTriggers[ruleId] = obj;
     }
     return outputTriggers
@@ -153,7 +153,7 @@ function getTriggers(triggers) {
     let triggersList = [];
     for (const trigger of triggers) {
         const id = trigger.RequiredItemId ? trigger.RequiredItemId.replace("(O)", "") : null;
-        const requiredTags = trigger.RequiredTags ? trigger.RequiredTags : [];
+        const requiredTags = trigger.RequiredTags ? [...trigger.RequiredTags] : [];
         if (id) {
             triggersList = processObjectById(id, requiredTags);
             continue;
@@ -164,10 +164,10 @@ function getTriggers(triggers) {
 }
 
 function processObjectByTags(requiredTags) {
-    const ids = getObjectsIds(requiredTags)
+    const ids = getObjectsIds(requiredTags);
     const objects = [];
     for (const id of ids) {
-        const obj = getObjectById(id)
+        const obj = getObjectById(id);
         objects.push(formatTrigger(obj.Name, obj.Price));
     }
     return objects;
@@ -249,6 +249,7 @@ function getObjectsIds(tagsInclude = [], tagsExclude = []) {
         const object = objGameData.Objects[objectId];
         const ct = object.ContextTags ? object.ContextTags : [];
         let isFromCat = cat ? object.Category == cat : true;
+        if (cat == -81 && object.Edibility < 0) isFromCat = false;
         if (includesAll(ct, tagsInclude) && !includesAny(ct, tagsExclude) && isFromCat) {
             ids.push(objectId);
         }
@@ -338,8 +339,6 @@ function hasEventHappened(player, eventId) {
     }
     return false;
 }
-
-
 
 function getPlayerProfessions(player) {
     const professions = [];
