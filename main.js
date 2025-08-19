@@ -57,6 +57,7 @@ function content() {
     divFieldSets.classList.add("row-cols-1");
     divFieldSets.classList.add("row-cols-sm-2");
     divFieldSets.classList.add("row-cols-lg-3");
+    divFieldSets.classList.add("row-cols-xl-4");
     divFieldSets.classList.add("pb-2");
     divFarmerPerks.appendChild(divFieldSets);
 
@@ -75,6 +76,10 @@ function content() {
         createMachineInput(fsMachines, machine);
     }
 
+    const fsOptions = createFieldSet(divFieldSets, "Options");
+
+    const chkFillAll = createCheckBox(fsOptions, "chkFillAll", "Fill all machines of the same type with the same crop");
+    
 }
 
 function createFieldSet(parent, legendText) {

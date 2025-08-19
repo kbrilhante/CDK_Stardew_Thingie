@@ -22,6 +22,7 @@ let saveFileData;
 
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
+    document.getElementById("chkFillAll").addEventListener("change", fillTable);
 
     loadJsonFiles().then((data) => {
         objGameData = data;
@@ -288,6 +289,7 @@ function loadSaveFile(e) {
         const xmlDoc = parser.parseFromString(contents, "application/xml");
         const saveFile = xmlToJson(xmlDoc.documentElement);
         handleSaveFile(saveFile);
+        fillTable();
     }
 
     reader.onerror = (err) => {
@@ -487,4 +489,10 @@ function fillPlayerInfo() {
 function toggleMachine(e) {
     console.log(e.target.id.replace("chk", ""));
     console.log(e.target.checked);
+}
+
+function fillTable() {
+    if (!saveFileData) return;
+    const chkFillAll = document.getElementById("chkFillAll").checked;
+    console.log(chkFillAll)
 }
