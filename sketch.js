@@ -20,6 +20,18 @@ let objGameData;
 let machinesData;
 let saveFileData;
 
+async function deleteThis() {
+    const URL = "./test files/DumbBunnies_411596522";
+    const response = await fetch(URL);
+    const contents = await response.text(response);
+
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(contents, "application/xml");
+    const saveFile = xmlToJson(xmlDoc.documentElement);
+    handleSaveFile(saveFile);
+    fillTable();
+}
+
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
     document.getElementById("chkFillAll").addEventListener("change", fillTable);
@@ -28,6 +40,8 @@ function startup() {
         objGameData = data;
         console.log("game data", objGameData);
         getMachineDetails();
+
+        deleteThis();
     });
 }
 
@@ -48,7 +62,7 @@ async function loadJsonFiles() {
 }
 
 function getMachineDetails() {
-    const bc = {...objGameData.BigCraftables};
+    const bc = { ...objGameData.BigCraftables };
     const machines = {};
     for (const id in bc) {
         const bcName = bc[id].Name;
@@ -91,12 +105,12 @@ function getOutputAndTriggers(outputRules) {
         };
         const output = rule.OutputItem[0];
         const triggers = rule.Triggers;
-        
+
         obj.Output = processOutput(output.Id, output.ItemId);
         obj.Triggers = processTriggers(triggers);
-        
+
         const ruleId = obj.Output.Name.replaceAll(" ", "");
-        
+
         outputTriggers[ruleId] = obj;
     }
     return outputTriggers
@@ -327,7 +341,6 @@ function handleSaveFile(saveObj) {
     saveFileData.HasBearPaw = hasEventHappened(player, BEAR_KNOWLEDGE_EVENT);
     saveFileData.HasSpringOnionMastery = hasEventHappened(player, SPRING_ONION_MASTERY_EVENT);
 
-    console.log("save file", saveFileData);
     fillPlayerInfo();
 }
 
@@ -493,6 +506,33 @@ function toggleMachine(e) {
 
 function fillTable() {
     if (!saveFileData) return;
+    console.log("save file", saveFileData);
     const chkFillAll = document.getElementById("chkFillAll").checked;
-    console.log(chkFillAll)
+    console.log(chkFillAll);
+
+    const objTableInfo = {};
+
+    // headers
+    objTableInfo.headers = [
+        { header: "Input Item", type: "string" },
+        { header: "Quality", type: "string" },
+        { header: "Quantity", type: "number" },
+        { header: "Input Item Sell Price", type: "number" },
+        // add here the machines
+    ];
+    objTableInfo.body = [];
+
+    for (let i = 0; i < 4; i++) {
+        const bodyRow = [
+            `<Input Item ${i}>`,
+            "<quality>",
+            "<quantity>",
+            "<sell price>"
+        ]
+        objTableInfo.body.push(bodyRow);
+
+    }
+
+    const table = createTable(document.getElementById("divTable"), "table", objTableInfo);
+    console.log(table)
 }

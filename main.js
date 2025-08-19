@@ -78,8 +78,11 @@ function content() {
 
     const fsOptions = createFieldSet(divFieldSets, "Options");
 
-    const chkFillAll = createCheckBox(fsOptions, "chkFillAll", "Fill all machines of the same type with the same crop");
-    
+    createCheckBox(fsOptions, "chkFillAll", "Fill all machines of the same type with the same crop");
+
+    const divTable = createDiv(contentTag);
+    divTable.id = "divTable";
+    // divTable.style.display = "none";
 }
 
 function createFieldSet(parent, legendText) {
@@ -133,7 +136,7 @@ function createMachineInput(parent, txtLabel) {
     div.appendChild(inpNumber);
 }
 
-function createCheckBox(parent, id, text="") {
+function createCheckBox(parent, id, text = "") {
     const div = createFormDiv(parent);
     const chk = document.createElement("input");
     chk.className = "form-check-input";
@@ -169,4 +172,92 @@ function setInputValue(id, value) {
 
 function getInputValue(id) {
     return document.getElementById(id).value;
+}
+
+
+function createTable(parent, id, content) {
+    const table = document.createElement("table");
+    table.id = id;
+    table.className = "table";
+    parent.appendChild(table);
+
+    const headers = content.headers;
+    const thead = document.createElement("thead");
+    table.appendChild(thead);
+    const tableHeader = createTableHeader(headers);
+    thead.appendChild(tableHeader);
+    const tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+
+    console.log(content.body)
+    for (const bodyRow of content.body) {
+        const row = createTableBodyRow(bodyRow);
+        tbody.appendChild(row);
+    }
+
+    return table;
+}
+
+function createTableRow() {
+    return document.createElement("tr");
+}
+
+/**
+ * @typedef {Object} TableHeader
+ * @property {string} header - Text content of the header cell.
+ * @property {string} type - Data type associated with the column.
+ */
+
+/**
+ * Creates a table header row from an array of header definitions.
+ *
+ * @param {TableHeader[]} headers - List of headers for the table.
+ * @returns {HTMLTableRowElement} A <tr> element containing the header cells.
+ *
+ * @example
+ * // Example: Create a header row with Name and Age columns
+ * const headers = [
+ *   { header: "Name", type: "string" },
+ *   { header: "Age", type: "number" }
+ * ];
+ * const tableHeaderRow = createTableHeader(headers);
+ * document.querySelector("thead").appendChild(tableHeaderRow);
+ */
+function createTableHeader(headers) {
+    const tr = createTableRow();
+
+    for (const objHeader of headers) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.innerHTML = objHeader.header;
+        th.setAttribute("data-type", objHeader.type);
+        tr.appendChild(th);
+    }
+
+    return tr;
+}
+
+/**
+ * Creates a table body row (`<tr>`) with a header cell and data cells.
+ *
+ * @param {(string|number)[]} bodyRow - The row data. First element becomes a <th>, rest become <td>.
+ * @returns {HTMLTableRowElement} A populated table row element.
+ */
+
+function createTableBodyRow(bodyRow) {
+    const tr = createTableRow();
+
+    const th = document.createElement("th");
+    th.scope = "row";
+    th.textContent = bodyRow[0];
+    tr.appendChild(th);
+
+    for (let i = 1; i < bodyRow.length; i++) {
+        const column = bodyRow[i];
+        const td = document.createElement("td");
+        td.textContent = column;
+        tr.appendChild(td);
+    }
+
+    return tr;
 }
