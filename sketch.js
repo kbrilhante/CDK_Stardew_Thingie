@@ -126,9 +126,17 @@ function getOutputAndTriggers(outputRules) {
 
 function processOutput(id, itemId, isFlavoredItem = false) {
     if (id.includes("(O)")) {
-        const object = getObjectById(id.replace("(O)", ""));
-        const name = getObjectName(object.DisplayName)
-        return formatOutput(name, object.Price, isFlavoredItem);
+        id = id.replace("(O)", "")
+        const object = getObjectById(id);
+        const name = getObjectName(object.DisplayName);
+        const formattedOutput = {
+            Id: id,
+            Name: name,
+            Price: object.Price,
+            IsFlavoredItem: isFlavoredItem,
+            Category: object.Category,
+        }
+        return formattedOutput;
     }
     itemId = itemId.replace("FLAVORED_ITEM", "");
     itemId = itemId.replace("DROP_IN_ID", "");
@@ -153,15 +161,6 @@ function getObjectName(displayName) {
     if (hasCollectionsTabName) displayName = displayName.replace("_Name", "_CollectionsTabName");
     const name = objGameData.Strings[displayName];
     return name
-}
-
-function formatOutput(name, price, isFlavoredItem = false) {
-    const obj = {
-        Name: name,
-        Price: price,
-        IsFlavoredItem: isFlavoredItem,
-    }
-    return obj;
 }
 
 function processTriggers(triggers) {
@@ -587,12 +586,11 @@ function fillTable() {
             item.Name,
             getQualityString(item.Quality),
             item.Stack,
-            getInputSellPrice(item),
+            getSellPrice(item),
         ];
         let hasMachines = false;
         for (const machine of machines) {
-            console.log("--- machine ---", machine)
-            const machineColumns = getMachinePrices(item, machine)
+            const machineColumns = getMachineColumns(item, machine);
             if (!machineColumns) {
                 row.push(...["no item", "-", "-", "-"]);
             } else {
@@ -620,20 +618,28 @@ function getItemByTrigger(machineData, trigger) {
     return null;
 }
 
-function getMachinePrices(item, machine) {
-    const response = [];
+function getMachineColumns(inputItem, machine) {
+    console.log("--- machine ---", machine)
+
     const machineData = machinesData[machine];
+    const outputKey = getItemByTrigger(machineData, inputItem); // gets the key of the machine processed product
+    if (!outputKey) return null;
 
-    const machineItem = getItemByTrigger(machineData, item); // gets the key of the machine processed product
+    const response = new Array(4);
 
-    if (!machineItem) return null;
-
-    // console.log(machineItem, machineData[machineItem])
-    const product = machineData[machineItem];
-    const output = product.Output;
-
+    const inputItemPrice = inputItem.Price;
+    const inputItemName = inputItem.Name;
+    console.log("input item:", inputItemName);
+    console.log("input item price:", inputItemPrice);
+    const product = machineData[outputKey];
+    console.log(outputKey, product)
+    const isFlavoredItem = product.Output.IsFlavoredItem;
+    response[0] = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : product.Output.Name;
+    
+    const minsReady = product.MinutesUntilReady;
     switch (machine) {
         case 'Dehydrator':
+            const daysReady = product.DaysUntilReady;
             break;
         case 'Keg':
             break;
@@ -645,38 +651,44 @@ function getMachinePrices(item, machine) {
     return response;
 }
 
-function getQualityString(quality) {
-    return objGameData.Quality[quality].quality
+function getFlavoredName(outputKey, inputItemName) {
+    const stringKeys = Object.keys(objGameData.Strings);
+    const keys = stringKeys.filter((stringKey) => stringKey.includes(`${outputKey}_Flavored`))
+    const inputId = getObjectIdByName(inputItemName);
+    const inputSpecificKeys = keys.filter((key) => key.includes(`(O)${inputId}`))
+    const stringKey = inputSpecificKeys.length > 0 ? inputSpecificKeys[0] : keys.filter((key) => key.includes("Flavored_Name"))[0]
+    return objGameData.Strings[stringKey].replace("{0}", inputItemName);
 }
 
-function getInputSellPrice(item) {
-    console.log(item)
+function getQualityString(quality) {
+    return objGameData.Quality[quality].quality;
+}
+
+function getSellPrice(item) {
     const cat = item.Category;
     const name = item.Name;
     const catInfo = cat ? getCategory(cat) : null
     const catProperties = catInfo ? catInfo.Properties : "";
-    console.log("cat info", catInfo)
     const qualityMultiplier = objGameData.Quality[item.Quality].multiplier;
-    
+
     // tiller
     const isTiller = document.getElementById("chkTiller").checked;
     const isAffectedByTiller = catProperties.includes("Affected by Tiller profession");
     const tillerMultiplier = isTiller && isAffectedByTiller ? 1.1 : 1;
-    
+
     // artisan
-    const isArtisan = document.getElementById("chkTiller").checked;
+    const isArtisan = document.getElementById("chkArtisan").checked;
     const isAffectedByArtisan = catProperties.includes("Affected by Artisan profession");
     const artisanMultiplier = isArtisan && isAffectedByArtisan ? 1.4 : 1;
-    
+
     // bear's knowledge
     const hasBear = document.getElementById("chkBear").checked;
     const isAffectedByBear = name === "Salmonberry" || name === "Blackberry";
     const bearMultiplier = hasBear && isAffectedByBear ? 3 : 1;
-    
+
     // spring onion mastery
     const hasSpringOnion = document.getElementById("chkSprOnion").checked;
     const isAffectedBySpringOnion = name === "Spring Onion";
-    console.log(name, isAffectedBySpringOnion)
     const springOnionMultiplier = hasSpringOnion && isAffectedBySpringOnion ? 5 : 1;
 
     return Math.floor(item.Price * qualityMultiplier * tillerMultiplier * artisanMultiplier * bearMultiplier * springOnionMultiplier);
