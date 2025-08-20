@@ -191,7 +191,7 @@ function processObjectByTags(requiredTags) {
     const objects = [];
     for (const id of ids) {
         const obj = getObjectById(id);
-        objects.push(formatTrigger(obj.Name, obj.Price));
+        objects.push(formatTrigger(obj.Name, obj.Price, obj.Category));
     }
     return objects;
 }
@@ -202,7 +202,7 @@ function processObjectById(id, requiredTags = []) {
     if (contextTags.includes('use_reverse_name_for_sorting')) {
         return getReverseProducts(object, requiredTags);
     }
-    return [formatTrigger(object.Name, object.Price)];
+    return [formatTrigger(object.Name, object.Price, object.Category)];
 }
 
 function getReverseProducts(object, requiredTags = []) {
@@ -215,7 +215,7 @@ function getReverseProducts(object, requiredTags = []) {
         case "Honey":
             childIds = getObjectsIds(["flower_item"], ["forage_item"]);
             multiplier = 2;
-            products.push(formatTrigger(`Wild ${name}`, calculatePrice(0, multiplier, offset)));
+            products.push(formatTrigger(`Wild ${name}`, calculatePrice(0, multiplier, offset), object.Category));
             break;
         case "Roe":
             const sturgeonId = 698;
@@ -238,13 +238,14 @@ function getReverseProduct(mainName, productId, multiplier, offset) {
     const object = getObjectById(productId);
     const objectName = `${object.Name} ${mainName}`;
     const objectPrice = calculatePrice(object.Price, multiplier, offset);
-    return formatTrigger(objectName, objectPrice);
+    return formatTrigger(objectName, objectPrice, object.Category);
 }
 
-function formatTrigger(name, price) {
+function formatTrigger(name, price, category) {
     const obj = {
         Name: name,
-        price: price
+        Price: price,
+        Category: category,
     }
     return obj;
 }
@@ -294,6 +295,15 @@ function getCategoryId(catString) {
     for (const cat of categories) {
         if (catString === cat["context tag"]) {
             return cat.value;
+        }
+    }
+}
+
+function getCategory(catValue) {
+    const categories = objGameData.Categories;
+    for (const cat of categories) {
+        if (catValue == cat.value) {
+            return cat;
         }
     }
 }
@@ -451,6 +461,7 @@ function getChestItems(chest) {
         chestItem.Quality = item.quality ? item.quality["#text"] : null;
         chestItem.Type = item.type ? item.type["#text"] : null;
         chestItem.Stack = item.stack ? item.stack["#text"] : null;
+        chestItem.Category = item.category ? item.category["#text"] : null;
         chestItems.push(chestItem);
     }
     return chestItems;
@@ -523,6 +534,7 @@ function filterItems(allItems, items, location) {
         const obj = {
             Name: item.Name,
             Quality: item.Quality,
+            Category: item.Category,
             Price: Number(item.Price),
             Stack: Number(item.Stack),
             Locations: [location]
@@ -583,7 +595,7 @@ function fillTable() {
             const machineColumns = getMachinePrices(item, machine)
             if (!machineColumns) {
                 row.push(...["no item", "-", "-", "-"]);
-            } else  {
+            } else {
                 row.push(...machineColumns);
                 hasMachines = true;
             }
@@ -613,10 +625,10 @@ function getMachinePrices(item, machine) {
     const machineData = machinesData[machine];
 
     const machineItem = getItemByTrigger(machineData, item); // gets the key of the machine processed product
-    
+
     if (!machineItem) return null;
 
-    console.log(machineItem, machineData[machineItem])
+    // console.log(machineItem, machineData[machineItem])
     const product = machineData[machineItem];
     const output = product.Output;
 
@@ -638,6 +650,34 @@ function getQualityString(quality) {
 }
 
 function getInputSellPrice(item) {
-    const multiplier = objGameData.Quality[item.Quality].multiplier;
-    return Math.floor(item.Price * multiplier);
+    console.log(item)
+    const cat = item.Category;
+    const name = item.Name;
+    const catInfo = cat ? getCategory(cat) : null
+    const catProperties = catInfo ? catInfo.Properties : "";
+    console.log("cat info", catInfo)
+    const qualityMultiplier = objGameData.Quality[item.Quality].multiplier;
+    
+    // tiller
+    const isTiller = document.getElementById("chkTiller").checked;
+    const isAffectedByTiller = catProperties.includes("Affected by Tiller profession");
+    const tillerMultiplier = isTiller && isAffectedByTiller ? 1.1 : 1;
+    
+    // artisan
+    const isArtisan = document.getElementById("chkTiller").checked;
+    const isAffectedByArtisan = catProperties.includes("Affected by Artisan profession");
+    const artisanMultiplier = isArtisan && isAffectedByArtisan ? 1.4 : 1;
+    
+    // bear's knowledge
+    const hasBear = document.getElementById("chkBear").checked;
+    const isAffectedByBear = name === "Salmonberry" || name === "Blackberry";
+    const bearMultiplier = hasBear && isAffectedByBear ? 3 : 1;
+    
+    // spring onion mastery
+    const hasSpringOnion = document.getElementById("chkSprOnion").checked;
+    const isAffectedBySpringOnion = name === "Spring Onion";
+    console.log(name, isAffectedBySpringOnion)
+    const springOnionMultiplier = hasSpringOnion && isAffectedBySpringOnion ? 5 : 1;
+
+    return Math.floor(item.Price * qualityMultiplier * tillerMultiplier * artisanMultiplier * bearMultiplier * springOnionMultiplier);
 }
