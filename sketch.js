@@ -36,6 +36,10 @@ async function deleteThis() {
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
     document.getElementById("chkFillAll").addEventListener("change", fillTable);
+    document.getElementById("chkTiller").addEventListener("change", fillTable);
+    document.getElementById("chkArtisan").addEventListener("change", fillTable);
+    document.getElementById("chkBear").addEventListener("change", fillTable);
+    document.getElementById("chkSprOnion").addEventListener("change", fillTable);
     for (const machine of MACHINES) {
         document.getElementById(`chk${machine}`).addEventListener("change", fillTable);
     }
