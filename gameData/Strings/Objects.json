@@ -418,6 +418,7 @@
   "DriedMushrooms_Description": "A package of gourmet mushrooms.",
   "DriedMushrooms_CollectionsTabDescription": "A package of gourmet mushrooms.",
   "DriedMushrooms_CollectionsTabName": "Dried Mushrooms",
+  "DriedMushrooms_Flavored_Name": "Dried {0}s",
   "DriedStarfish_Name": "Dried Starfish",
   "DriedStarfish_Description": "A starfish from the primordial ocean. It's an unusually pristine specimen!",
   "Driftwood_Name": "Driftwood",

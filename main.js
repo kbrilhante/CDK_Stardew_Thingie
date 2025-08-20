@@ -121,7 +121,7 @@ function createMachineInput(parent, txtLabel) {
 
     const chk = createCheckBox(div, `chk${txtLabel}`);
     chk.checked = true;
-    chk.onchange = toggleMachine;
+    // chk.onchange = toggleMachine;
 
     const span = document.createElement("span");
     span.className = "input-group-text";
@@ -174,11 +174,11 @@ function getInputValue(id) {
     return document.getElementById(id).value;
 }
 
-
 function createTable(parent, id, content) {
+    parent.innerHTML = "";
     const table = document.createElement("table");
     table.id = id;
-    table.className = "table";
+    table.className = "table table-striped-columns table-hover";
     parent.appendChild(table);
 
     const headers = content.headers;
@@ -189,7 +189,6 @@ function createTable(parent, id, content) {
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
-    console.log(content.body)
     for (const bodyRow of content.body) {
         const row = createTableBodyRow(bodyRow);
         tbody.appendChild(row);

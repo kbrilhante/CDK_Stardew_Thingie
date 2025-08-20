@@ -7,13 +7,13 @@ const JSON_URL_OBJECTS = "./gameData/Data/Objects.json";
 const JSON_URL_STRINGS_OBJECTS = "./gameData/Strings/Objects.json";
 const JSON_URL_CATEGORIES = "./gameData/categories.json";
 const JSON_URL_PROFESSIONS = "./gameData/professions.json";
-// const JSON_URL_COLORS = "./Data/colors.json"
-// const JSON_URL_ITEM_TYPES = "./Data/item_types.json";
-// const JSON_URL_QUALITY = "./Data/quality.json";
+const JSON_URL_QUALITY = "./gameData/quality.json";
+// const JSON_URL_COLORS = ""
+// const JSON_URL_ITEM_TYPES = "";
 const BEAR_KNOWLEDGE_EVENT = "2120303";
 const SPRING_ONION_MASTERY_EVENT = "3910979";
 
-const MACHINES = ["Dehydrator", "Keg", "Preserves Jar"];
+const MACHINES = ["Keg", "Preserves Jar", "Dehydrator"];
 
 // global variables
 let objGameData;
@@ -29,12 +29,16 @@ async function deleteThis() {
     const xmlDoc = parser.parseFromString(contents, "application/xml");
     const saveFile = xmlToJson(xmlDoc.documentElement);
     handleSaveFile(saveFile);
+    filterInventory();
     fillTable();
 }
 
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
     document.getElementById("chkFillAll").addEventListener("change", fillTable);
+    for (const machine of MACHINES) {
+        document.getElementById(`chk${machine}`).addEventListener("change", fillTable);
+    }
 
     loadJsonFiles().then((data) => {
         objGameData = data;
@@ -54,9 +58,9 @@ async function loadJsonFiles() {
     obj.Strings = await loadJson(JSON_URL_STRINGS_OBJECTS);
     obj.Categories = await loadJson(JSON_URL_CATEGORIES);
     obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
+    obj.Quality = await loadJson(JSON_URL_QUALITY);
     // obj.Colors = await loadJson(JSON_URL_COLORS);
     // obj.ItemTypes = await loadJson(JSON_URL_ITEM_TYPES);
-    // obj.Quality = await loadJson(JSON_URL_QUALITY);
 
     return obj;
 }
@@ -303,6 +307,7 @@ function loadSaveFile(e) {
         const xmlDoc = parser.parseFromString(contents, "application/xml");
         const saveFile = xmlToJson(xmlDoc.documentElement);
         handleSaveFile(saveFile);
+        filterInventory();
         fillTable();
     }
 
@@ -321,17 +326,14 @@ function handleSaveFile(saveObj) {
     const allItems = sortItemsByLocation(saveObj);
     console.log("all items", allItems)
     let machines = getMachines(allItems);
-    saveFileData.machines = machines;
+    saveFileData.Machines = machines;
 
-    let inventory = getChests(allItems);
+    saveFileData.ChestItems = getChests(allItems);
 
     const player = saveObj.player;
-
-    console.log("player", player)
+    console.log("player", player);
     const playerInventory = getChestItems(player);
-    inventory.PlayerInventory = playerInventory;
-
-    saveFileData.Inventory = inventory;
+    saveFileData.PlayerItems = playerInventory;
 
     const playerProfessions = getPlayerProfessions(player);
     const tillerId = getProfession("Tiller");
@@ -393,11 +395,11 @@ function getMachines(allItems) {
             }
             totalAmount += amount;
             if (amount > 0) machines[machine][location] = {
-                amount: amount,
-                readyForHarvest: readyForHarvest,
+                Amount: amount,
+                ReadyForHarvest: readyForHarvest,
             }
         }
-        machines[machine].totalAmount = totalAmount;
+        machines[machine].TotalAmount = totalAmount;
     }
     return machines;
 }
@@ -409,10 +411,10 @@ function getChests(allItems) {
         const arrChests = [];
         for (const item of items) {
             if (item.xsiType === "Chest") {
-                item.items = getChestItems(item.info);
-                if (item.items.length == 0) continue;
-                item.playerChoiceColor = item.info.playerChoiceColor;
-                item.location = {
+                item.Items = getChestItems(item.info);
+                if (item.Items.length == 0) continue;
+                item.PlayerChoiceColor = item.info.playerChoiceColor;
+                item.Location = {
                     X: item.info.boundingBox.X["#text"],
                     Y: item.info.boundingBox.Y["#text"],
                 };
@@ -437,14 +439,14 @@ function getChestItems(chest) {
         const name = item.name["#text"];
         if (!machinesData.AllTriggers.includes(name)) continue;
         const chestItem = {
-            name: name,
-            itemId: item.itemId["#text"],
+            Name: name,
+            ItemId: item.itemId["#text"],
         };
-        chestItem.item = item ? item : null
-        chestItem.price = item.price ? item.price["#text"] : null;
-        chestItem.quality = item.quality ? item.quality["#text"] : null;
-        chestItem.type = item.type ? item.type["#text"] : null;
-        chestItem.stack = item.stack ? item.stack["#text"] : null;
+        chestItem.Item = item ? item : null
+        chestItem.Price = item.price ? item.price["#text"] : null;
+        chestItem.Quality = item.quality ? item.quality["#text"] : null;
+        chestItem.Type = item.type ? item.type["#text"] : null;
+        chestItem.Stack = item.stack ? item.stack["#text"] : null;
         chestItems.push(chestItem);
     }
     return chestItems;
@@ -493,22 +495,51 @@ function fillPlayerInfo() {
     fillCheckBox("chkArtisan", saveFileData.IsArtisan);
     fillCheckBox("chkBear", saveFileData.HasBearPaw);
     fillCheckBox("chkSprOnion", saveFileData.HasSpringOnionMastery);
-    for (const machine in saveFileData.machines) {
-        const value = saveFileData.machines[machine].totalAmount
+    for (const machine in saveFileData.Machines) {
+        const value = saveFileData.Machines[machine].TotalAmount;
         setInputValue(`inp${machine}`, value);
     }
 }
 
-function toggleMachine(e) {
-    console.log(e.target.id.replace("chk", ""));
-    console.log(e.target.checked);
+function filterInventory() {
+    const allItems = [];
+    for (const location in saveFileData.ChestItems) {
+        const locationInventory = saveFileData.ChestItems[location];
+        for (const chest of locationInventory) {
+            const chestItems = chest.Items;
+            filterItems(allItems, chestItems, location);
+        }
+    }
+    filterItems(allItems, saveFileData.PlayerItems, "Player inventory");
+    saveFileData.AllItems = allItems;
+}
+
+function filterItems(allItems, items, location) {
+    for (const item of items) {
+        const obj = {
+            Name: item.Name,
+            Quality: item.Quality,
+            Price: Number(item.Price),
+            Stack: Number(item.Stack),
+            Locations: [location]
+        }
+        const index = arrayFindIndexByKeys(allItems, obj, ["Name", "Quality"]);
+        if (index < 0) {
+            allItems.push(obj);
+        } else {
+            allItems[index].Stack += obj.Stack;
+            if (!allItems[index].Locations.includes(obj.Locations[0])) {
+                allItems[index].Locations.push(...obj.Locations);
+            }
+        }
+    }
 }
 
 function fillTable() {
     if (!saveFileData) return;
     console.log("save file", saveFileData);
     const chkFillAll = document.getElementById("chkFillAll").checked;
-    console.log(chkFillAll);
+    console.log("fill all?", chkFillAll);
 
     const objTableInfo = {};
 
@@ -518,21 +549,91 @@ function fillTable() {
         { header: "Quality", type: "string" },
         { header: "Quantity", type: "number" },
         { header: "Input Item Sell Price", type: "number" },
-        // add here the machines
     ];
+    const machines = [];
+    for (const machine of MACHINES) {
+        const chkMachine = document.getElementById(`chk${machine}`);
+        if (chkMachine.checked) {
+            machines.push(machine);
+            const columns = [
+                { header: `${machine} Processed Item`, type: "string" },
+                { header: `${machine} Processed Sell Price`, type: "number" },
+                { header: `${machine} Productivity (g/minute)`, type: "number" },
+                { header: `${machine} Productivity (g/day)`, type: "number" },
+            ]
+            objTableInfo.headers.push(...columns);
+        }
+    }
+
     objTableInfo.body = [];
-
-    for (let i = 0; i < 4; i++) {
-        const bodyRow = [
-            `<Input Item ${i}>`,
-            "<quality>",
-            "<quantity>",
-            "<sell price>"
-        ]
-        objTableInfo.body.push(bodyRow);
-
+    for (const item of saveFileData.AllItems) {
+        const row = [
+            item.Name,
+            getQualityString(item.Quality),
+            item.Stack,
+            getInputSellPrice(item),
+        ];
+        let hasMachines = false;
+        for (const machine of machines) {
+            console.log("--- machine ---", machine)
+            const machineColumns = getMachinePrices(item, machine)
+            if (!machineColumns) {
+                row.push(...["no item", "-", "-", "-"]);
+            } else  {
+                row.push(...machineColumns);
+                hasMachines = true;
+            }
+        }
+        if (hasMachines) objTableInfo.body.push(row);
     }
 
     const table = createTable(document.getElementById("divTable"), "table", objTableInfo);
     console.log(table)
+}
+
+function getItemByTrigger(machineData, trigger) {
+    for (const produce in machineData) {
+        if (produce != "AllTriggers") {
+            const list = machineData[produce].Triggers.TriggersList;
+            const index = arrayFindIndexByKeys(list, trigger, ["Name"]);
+            if (index >= 0) {
+                return produce;
+            }
+        }
+    }
+    return null;
+}
+
+function getMachinePrices(item, machine) {
+    const response = [];
+    const machineData = machinesData[machine];
+
+    const machineItem = getItemByTrigger(machineData, item); // gets the key of the machine processed product
+    
+    if (!machineItem) return null;
+
+    console.log(machineItem, machineData[machineItem])
+    const product = machineData[machineItem];
+    const output = product.Output;
+
+    switch (machine) {
+        case 'Dehydrator':
+            break;
+        case 'Keg':
+            break;
+        case 'Preserves Jar':
+            break;
+    }
+
+    // return [item name, sell price, productivity g/minute, productivity g/day]
+    return response;
+}
+
+function getQualityString(quality) {
+    return objGameData.Quality[quality].quality
+}
+
+function getInputSellPrice(item) {
+    const multiplier = objGameData.Quality[item.Quality].multiplier;
+    return Math.floor(item.Price * multiplier);
 }
