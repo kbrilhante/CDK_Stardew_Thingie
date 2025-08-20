@@ -5,15 +5,15 @@
     "context tag": "category_gem",
     "English translation": "Mineral",
     "Color": "#6E005A",
-    "Properties": "Affected by Gemologist profession"
+    "Properties": "Affected by Gemologist profession"
   },
   {
     "value": -4,
     "internal constant": "Object.FishCategory",
     "context tag": "category_fish",
     "English translation": "Fish",
-    "Color": "#00008B (DarkBlue)",
-    "Properties": "Affected by Fisher and Angler professions"
+    "Color": "#00008B (DarkBlue)",
+    "Properties": "Affected by Fisher and Angler professions"
   },
   {
     "value": -5,
@@ -21,7 +21,7 @@
     "context tag": "category_egg",
     "English translation": "Animal Product",
     "Color": "#FF0064",
-    "Properties": "Affected by Rancher profession, can be used in a slingshot"
+    "Properties": "Affected by Rancher profession, can be used in a slingshot"
   },
   {
     "value": -6,
@@ -29,7 +29,7 @@
     "context tag": "category_milk",
     "English translation": "Animal Product",
     "Color": "#FF0064",
-    "Properties": "Affected by Rancher profession"
+    "Properties": "Affected by Rancher profession"
   },
   {
     "value": -7,
@@ -61,7 +61,7 @@
     "context tag": "category_minerals",
     "English translation": "Mineral",
     "Color": "#6E005A",
-    "Properties": "Affected by Gemologist profession"
+    "Properties": "Affected by Gemologist profession"
   },
   {
     "value": -14,
@@ -101,14 +101,14 @@
     "context tag": "category_sell_at_pierres_and_marnies",
     "English translation": "Animal Product",
     "Color": "#FF0064",
-    "Properties": "Affected by Rancher profession"
+    "Properties": "Affected by Rancher profession"
   },
   {
     "value": -19,
     "internal constant": "Object.fertilizerCategory",
     "context tag": "category_fertilizer",
     "English translation": "Fertilizer",
-    "Color": "#708090 (SlateGray)",
+    "Color": "#708090 (SlateGray)",
     "Properties": "Is Placeable, is always passable"
   },
   {
@@ -116,7 +116,7 @@
     "internal constant": "Object.junkCategory",
     "context tag": "category_junk",
     "English translation": "Trash",
-    "Color": "#696969 (DimGray)",
+    "Color": "#696969 (DimGray)",
     "Properties": ""
   },
   {
@@ -124,7 +124,7 @@
     "internal constant": "Object.baitCategory",
     "context tag": "category_bait",
     "English translation": "Bait",
-    "Color": "#8B0000 (DarkRed)",
+    "Color": "#8B0000 (DarkRed)",
     "Properties": "Can be attached to a fishing rod"
   },
   {
@@ -132,7 +132,7 @@
     "internal constant": "Object.tackleCategory",
     "context tag": "category_tackle",
     "English translation": "Fishing Tackle",
-    "Color": "#008B8B (DarkCyan)",
+    "Color": "#008B8B (DarkCyan)",
     "Properties": "Can be attached to a fishing rod, cannot stack"
   },
   {
@@ -165,7 +165,7 @@
     "context tag": "category_artisan_goods",
     "English translation": "Artisan Goods",
     "Color": "#009B6F",
-    "Properties": "Affected by Artisan profession"
+    "Properties": "Affected by Artisan profession"
   },
   {
     "value": -27,
@@ -173,7 +173,7 @@
     "context tag": "category_syrup",
     "English translation": "Artisan Goods",
     "Color": "#009B6F",
-    "Properties": "Affected by Tapper profession"
+    "Properties": "Affected by Tapper profession"
   },
   {
     "value": -28,
@@ -196,7 +196,7 @@
     "internal constant": "Object.SeedsCategory",
     "context tag": "category_seeds",
     "English translation": "Seed",
-    "Color": "#A52A2A (Brown)",
+    "Color": "#A52A2A (Brown)",
     "Properties": "Is Placeable, is always passable"
   },
   {
@@ -204,16 +204,16 @@
     "internal constant": "Object.VegetableCategory",
     "context tag": "category_vegetable",
     "English translation": "Vegetable",
-    "Color": "#008000 (Green)",
-    "Properties": "Affected by Tiller profession, can be used in a slingshot"
+    "Color": "#008000 (Green)",
+    "Properties": "Affected by Tiller profession, can be used in a slingshot"
   },
   {
     "value": -79,
     "internal constant": "Object.FruitsCategory",
     "context tag": "category_fruits",
     "English translation": "Fruit",
-    "Color": "#FF1493 (DeepPink)",
-    "Properties": "Affected by Tiller profession (if not foraged), can be used in a slingshot"
+    "Color": "#FF1493 (DeepPink)",
+    "Properties": "Affected by Tiller profession (if not foraged), can be used in a slingshot"
   },
   {
     "value": -80,
@@ -221,7 +221,7 @@
     "context tag": "category_flowers",
     "English translation": "Flower",
     "Color": "#DB36D3",
-    "Properties": "Affected by Tiller profession"
+    "Properties": "Affected by Tiller profession"
   },
   {
     "value": -81,
