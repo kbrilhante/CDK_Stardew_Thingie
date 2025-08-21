@@ -573,6 +573,7 @@ function fillTable() {
         { header: "Input Item Sell Price", type: "number" },
     ];
     const machines = [];
+    let machineColumnsSize;
     for (const machine of MACHINES) {
         const chkMachine = document.getElementById(`chk${machine}`);
         if (chkMachine.checked) {
@@ -580,9 +581,11 @@ function fillTable() {
             const columns = [
                 { header: `${machine} Processed Item`, type: "string" },
                 { header: `${machine} Processed Sell Price`, type: "number" },
+                { header: `${machine} Profit`, type: "number" },
                 { header: `${machine} Productivity (g/minute)`, type: "number" },
-                { header: `${machine} Productivity (g/day)`, type: "number" },
+                { header: `${machine} Aproximate g/day`, type: "number" },
             ]
+            machineColumnsSize = columns.length;
             objTableInfo.headers.push(...columns);
         }
     }
@@ -597,9 +600,11 @@ function fillTable() {
         ];
         let hasMachines = false;
         for (const machine of machines) {
-            const machineColumns = getMachineColumns(item, machine);
+            const machineColumns = getMachineColumns(item, machine, machineColumnsSize);
             if (!machineColumns) {
-                row.push(...["no item", "-", "-", "-"]);
+                for (let i = 0; i < machineColumnsSize; i++) {
+                    row.push("-")
+                }
             } else {
                 row.push(...machineColumns);
                 hasMachines = true;
@@ -625,14 +630,14 @@ function getItemByTrigger(machineData, trigger) {
     return null;
 }
 
-function getMachineColumns(inputItem, machine) {
+function getMachineColumns(inputItem, machine, machineColumnsSize) {
     console.log("--- machine ---", machine)
 
     const machineData = machinesData[machine];
     const outputKey = getItemByTrigger(machineData, inputItem); // gets the key of the machine processed product
     if (!outputKey) return null;
 
-    const response = new Array(4);
+    const response = new Array(machineColumnsSize);
 
     const inputItemPrice = inputItem.Price;
     const inputItemName = inputItem.Name;
@@ -644,7 +649,22 @@ function getMachineColumns(inputItem, machine) {
     const isFlavoredItem = output.IsFlavoredItem;
     // processed item name
     response[0] = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : output.Name;
-    response[1] = getOutputPrice(output, inputItemPrice);
+    // sell price
+    const sellPrice = getOutputPrice(output, inputItemPrice);
+    response[1] = sellPrice;
+    // profit
+    const profit = sellPrice - getSellPrice(inputItem);
+    response[2] = profit;
+    
+    const minutesInADay = 1600;
+    // productivity g/minute
+    const processingTimeMins = product.MinutesUntilReady > 0 ? product.MinutesUntilReady : product.DaysUntilReady * minutesInADay;
+    const productivity = Math.round(profit / processingTimeMins * 1000) / 1000;
+    response[3] = productivity
+
+    // g/day
+    response[4] = Math.round(productivity * 1600);
+
     return response;
 }
 
@@ -668,8 +688,6 @@ function getOutputPrice(output, inputItemPrice) {
         Price: output.Price,
         Quality: "0",
     };
-    console.log(output, inputItemPrice)
-    console.log(item)
     if (output.IsFlavoredItem) {
         item.Price = inputItemPrice * output.Multiplier + output.Price;
     }
