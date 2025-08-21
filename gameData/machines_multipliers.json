@@ -1,0 +1,68 @@
+{
+  "Keg": {
+    "Beer": {
+      "Price": 200,
+      "Multiplier": 1
+    },
+    "Coffee": {
+      "Price": 150,
+      "Multiplier": 1
+    },
+    "GreenTea": {
+      "Price": 100,
+      "Multiplier": 1
+    },
+    "Juice": {
+      "Price": 0,
+      "Multiplier": 2.25
+    },
+    "Mead": {
+      "Price": 300,
+      "Multiplier": 1
+    },
+    "PaleAle": {
+      "Price": 300,
+      "Multiplier": 1
+    },
+    "Vinegar": {
+      "Price": 100,
+      "Multiplier": 1
+    },
+    "Wine": {
+      "Price": 0,
+      "Multiplier": 3
+    }
+  },
+  "Preserves Jar": {
+    "Pickles": {
+      "Price": 50,
+      "Multiplier": 2
+    },
+    "Jelly": {
+      "Price": 50,
+      "Multiplier": 2
+    },
+    "Caviar": {
+      "Price": 500,
+      "Multiplier": 1
+    },
+    "AgedRoe": {
+      "Price": 0,
+      "Multiplier": 2
+    }
+  },
+  "Dehydrator": {
+    "DriedMushrooms": {
+      "Price": 25,
+      "Multiplier": 7.5
+    },
+    "DriedFruit": {
+      "Price": 25,
+      "Multiplier": 7.5
+    },
+    "Raisins": {
+      "Price": 600,
+      "Multiplier": 1
+    }
+  }
+}

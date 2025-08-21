@@ -8,6 +8,7 @@ const JSON_URL_STRINGS_OBJECTS = "./gameData/Strings/Objects.json";
 const JSON_URL_CATEGORIES = "./gameData/categories.json";
 const JSON_URL_PROFESSIONS = "./gameData/professions.json";
 const JSON_URL_QUALITY = "./gameData/quality.json";
+const JSON_URL_MULTIPLIERS = "./gameData/machines_multipliers.json";
 // const JSON_URL_COLORS = ""
 // const JSON_URL_ITEM_TYPES = "";
 const BEAR_KNOWLEDGE_EVENT = "2120303";
@@ -63,6 +64,7 @@ async function loadJsonFiles() {
     obj.Categories = await loadJson(JSON_URL_CATEGORIES);
     obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
     obj.Quality = await loadJson(JSON_URL_QUALITY);
+    obj.Multipliers = await loadJson(JSON_URL_MULTIPLIERS);
     // obj.Colors = await loadJson(JSON_URL_COLORS);
     // obj.ItemTypes = await loadJson(JSON_URL_ITEM_TYPES);
 
@@ -77,7 +79,8 @@ function getMachineDetails() {
         if (MACHINES.includes(bcName)) {
             const machineDetails = objGameData.Machines["(BC)" + id];
             let outputRules = [...machineDetails.OutputRules];
-            machines[bcName] = getOutputAndTriggers(outputRules);
+            const machineMultipliers = objGameData.Multipliers[bcName]
+            machines[bcName] = getOutputAndTriggers(outputRules, machineMultipliers);
         }
     }
     machinesData = machines;
@@ -103,7 +106,7 @@ function groupAllMachineTriggers() {
     machinesData.AllTriggers = setToArray(allTriggers);
 }
 
-function getOutputAndTriggers(outputRules) {
+function getOutputAndTriggers(outputRules, machineMultipliers) {
     const outputTriggers = {};
 
     for (let rule of outputRules) {
@@ -111,30 +114,33 @@ function getOutputAndTriggers(outputRules) {
             DaysUntilReady: rule.DaysUntilReady,
             MinutesUntilReady: rule.MinutesUntilReady,
         };
-        const output = rule.OutputItem[0];
+        const output = rule.OutputItem[0]; // they all have only one output
         const triggers = rule.Triggers;
 
-        obj.Output = processOutput(output.Id, output.ItemId);
+        obj.Output = processOutput(output.Id, output.ItemId, machineMultipliers);
         obj.Triggers = processTriggers(triggers);
-
-        const ruleId = obj.Output.Name.replaceAll(" ", "");
-
+        const ruleId = obj.Output.RuleId;
+        
         outputTriggers[ruleId] = obj;
     }
-    return outputTriggers
+    return outputTriggers;
 }
 
-function processOutput(id, itemId, isFlavoredItem = false) {
+function processOutput(id, itemId, machineMultipliers, isFlavoredItem = false) {
     if (id.includes("(O)")) {
         id = id.replace("(O)", "")
         const object = getObjectById(id);
         const name = getObjectName(object.DisplayName);
+        const ruleId = name.replaceAll(" ", "");
+        const mult = machineMultipliers[ruleId];
         const formattedOutput = {
+            RuleId: ruleId,
             Id: id,
             Name: name,
-            Price: object.Price,
             IsFlavoredItem: isFlavoredItem,
             Category: object.Category,
+            Price: mult.Price,
+            Multiplier: mult.Multiplier,
         }
         return formattedOutput;
     }
@@ -151,7 +157,7 @@ function processOutput(id, itemId, isFlavoredItem = false) {
             break;
     }
     id = "(O)" + getObjectIdByName(itemId);
-    return processOutput(id, itemId, true);
+    return processOutput(id, itemId, machineMultipliers, true);
 }
 
 function getObjectName(displayName) {
@@ -334,7 +340,7 @@ function loadSaveFile(e) {
 function handleSaveFile(saveObj) {
     saveFileData = {};
 
-    console.log(saveObj)
+    console.log(saveObj);
 
     const allItems = sortItemsByLocation(saveObj);
     console.log("all items", allItems)
@@ -525,6 +531,7 @@ function filterInventory() {
         }
     }
     filterItems(allItems, saveFileData.PlayerItems, "Player inventory");
+    allItems.sort((a, b) => a.Name.localeCompare(b.Name));
     saveFileData.AllItems = allItems;
 }
 
@@ -632,22 +639,10 @@ function getMachineColumns(inputItem, machine) {
     console.log("input item:", inputItemName);
     console.log("input item price:", inputItemPrice);
     const product = machineData[outputKey];
-    console.log(outputKey, product)
+    console.log(outputKey, product);
     const isFlavoredItem = product.Output.IsFlavoredItem;
-    response[0] = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : product.Output.Name;
-    
-    const minsReady = product.MinutesUntilReady;
-    switch (machine) {
-        case 'Dehydrator':
-            const daysReady = product.DaysUntilReady;
-            break;
-        case 'Keg':
-            break;
-        case 'Preserves Jar':
-            break;
-    }
+    response[0] = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : product.Output.Name
 
-    // return [item name, sell price, productivity g/minute, productivity g/day]
     return response;
 }
 

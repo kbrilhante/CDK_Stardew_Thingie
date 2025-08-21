@@ -15,7 +15,7 @@
     "item type": "Boots",
     "type identifier": "(B)",
     "data asset": "Data/Boots",
-    "brief summary": "Items which can be equipped in the player's boots slot. These change the player sprite and may provide buffs."
+    "brief summary": "Items which can be equipped in the player's boots slot. These change the player sprite and may provide buffs."
   },
   {
     "item type": "Furniture",
@@ -27,7 +27,7 @@
     "item type": "Hats",
     "type identifier": "(H)",
     "data asset": "Data/Hats",
-    "brief summary": "Items which can be equipped in the player's hat slot. These change the player sprite."
+    "brief summary": "Items which can be equipped in the player's hat slot. These change the player sprite."
   },
   {
     "item type": "Mannequins",
@@ -39,13 +39,13 @@
     "item type": "Pants",
     "type identifier": "(P)",
     "data asset": "Data/Pants",
-    "brief summary": "Items which can be equipped in the player's pants slot. These change the player sprite."
+    "brief summary": "Items which can be equipped in the player's pants slot. These change the player sprite."
   },
   {
     "item type": "Shirts",
     "type identifier": "(S)",
     "data asset": "Data/Shirts",
-    "brief summary": "Items which can be equipped in the player's shirt slot. These change the player sprite."
+    "brief summary": "Items which can be equipped in the player's shirt slot. These change the player sprite."
   },
   {
     "item type": "Tools",
@@ -57,13 +57,13 @@
     "item type": "Trinkets",
     "type identifier": "(TR)",
     "data asset": "Data/Trinkets",
-    "brief summary": "Items that can be equipped in the player's trinket slot to enable special effects."
+    "brief summary": "Items that can be equipped in the player's trinket slot to enable special effects."
   },
   {
     "item type": "Wallpaper & flooring",
-    "type identifier": "(WP) and (FL)",
+    "type identifier": "(WP) and (FL)",
     "data asset": "Data/AdditionalWallpaperFlooring",
-    "brief summary": "Items which can be applied to a decoratable location (e.g. a farmhouse or shed) to visually change its floor or wall design. (These are separate from placeable items like brick floor.)"
+    "brief summary": "Items which can be applied to a decoratable location (e.g. a farmhouse or shed) to visually change its floor or wall design. (These are separate from placeable items like brick floor.)"
   },
   {
     "item type": "Weapons",
