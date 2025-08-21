@@ -120,7 +120,7 @@ function getOutputAndTriggers(outputRules, machineMultipliers) {
         obj.Output = processOutput(output.Id, output.ItemId, machineMultipliers);
         obj.Triggers = processTriggers(triggers);
         const ruleId = obj.Output.RuleId;
-        
+
         outputTriggers[ruleId] = obj;
     }
     return outputTriggers;
@@ -573,19 +573,23 @@ function fillTable() {
         { header: "Input Item Sell Price", type: "number" },
     ];
     const machines = [];
-    let machineColumnsSize;
+    const machineHeaders = [
+        { header: `{machine} Processed Item`, type: "string" },
+        { header: `{machine} Processed Sell Price`, type: "number" },
+        { header: `{machine} Profit (g/input item)`, type: "number" },
+        { header: `{machine} Productivity (g/minute)`, type: "number" },
+        // { header: `{machine} Aproximate g/day`, type: "number" },
+    ];
     for (const machine of MACHINES) {
         const chkMachine = document.getElementById(`chk${machine}`);
         if (chkMachine.checked) {
             machines.push(machine);
-            const columns = [
-                { header: `${machine} Processed Item`, type: "string" },
-                { header: `${machine} Processed Sell Price`, type: "number" },
-                { header: `${machine} Profit`, type: "number" },
-                { header: `${machine} Productivity (g/minute)`, type: "number" },
-                { header: `${machine} Aproximate g/day`, type: "number" },
-            ]
-            machineColumnsSize = columns.length;
+            const columns = [];
+            for (const header of machineHeaders) {
+                const newHeader = {...header}
+                newHeader.header = newHeader.header.replace("{machine}", machine);
+                columns.push(newHeader)
+            };
             objTableInfo.headers.push(...columns);
         }
     }
@@ -600,9 +604,9 @@ function fillTable() {
         ];
         let hasMachines = false;
         for (const machine of machines) {
-            const machineColumns = getMachineColumns(item, machine, machineColumnsSize);
+            const machineColumns = getMachineColumns(item, machine, machineHeaders);
             if (!machineColumns) {
-                for (let i = 0; i < machineColumnsSize; i++) {
+                for (let i = 0; i < machineHeaders.length; i++) {
                     row.push("-")
                 }
             } else {
@@ -630,14 +634,14 @@ function getItemByTrigger(machineData, trigger) {
     return null;
 }
 
-function getMachineColumns(inputItem, machine, machineColumnsSize) {
+function getMachineColumns(inputItem, machine, machineHeaders) {
     console.log("--- machine ---", machine)
 
     const machineData = machinesData[machine];
     const outputKey = getItemByTrigger(machineData, inputItem); // gets the key of the machine processed product
     if (!outputKey) return null;
 
-    const response = new Array(machineColumnsSize);
+    const response = [];
 
     const inputItemPrice = inputItem.Price;
     const inputItemName = inputItem.Name;
@@ -647,23 +651,39 @@ function getMachineColumns(inputItem, machine, machineColumnsSize) {
     console.log(outputKey, product);
     const output = product.Output;
     const isFlavoredItem = output.IsFlavoredItem;
+
     // processed item name
-    response[0] = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : output.Name;
+    const processedItemName = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : output.Name;
+    
     // sell price
     const sellPrice = getOutputPrice(output, inputItemPrice);
-    response[1] = sellPrice;
-    // profit
-    const profit = sellPrice - getSellPrice(inputItem);
-    response[2] = profit;
     
-    const minutesInADay = 1600;
+    // profit
+    const profit = (sellPrice - getSellPrice(inputItem)) / product.Triggers.RequiredCount;    
+    
     // productivity g/minute
+    const minutesInADay = 1600;
     const processingTimeMins = product.MinutesUntilReady > 0 ? product.MinutesUntilReady : product.DaysUntilReady * minutesInADay;
     const productivity = Math.round(profit / processingTimeMins * 1000) / 1000;
-    response[3] = productivity
-
+    
     // g/day
-    response[4] = Math.round(productivity * 1600);
+    const goldDay = Math.round(productivity * 1600);
+    
+    for (const header of machineHeaders) {
+        console.log(header.header)
+        const title = header.header;
+        if (title.includes("Processed Item")) {
+            response.push(processedItemName);
+        } else if (title.includes("Processed Sell Price")) {
+            response.push(sellPrice);
+        } else if (title.includes("Profit (g/input item)")) {
+            response.push(profit);
+        } else if (title.includes("Productivity (g/minute)")) {
+            response.push(productivity);
+        } else if (title.includes("Aproximate g/day")) {
+            response.push(goldDay);
+        }
+    }
 
     return response;
 }
@@ -722,7 +742,7 @@ function getSellPrice(item) {
     const springOnionMultiplier = hasSpringOnion && isAffectedBySpringOnion ? 5 : 1;
 
     let price = Math.floor(
-        item.Price 
+        item.Price
         * qualityMultiplier
         * tillerMultiplier
         * bearMultiplier
