@@ -640,9 +640,11 @@ function getMachineColumns(inputItem, machine) {
     console.log("input item price:", inputItemPrice);
     const product = machineData[outputKey];
     console.log(outputKey, product);
-    const isFlavoredItem = product.Output.IsFlavoredItem;
-    response[0] = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : product.Output.Name
-
+    const output = product.Output;
+    const isFlavoredItem = output.IsFlavoredItem;
+    // processed item name
+    response[0] = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : output.Name;
+    response[1] = getOutputPrice(output, inputItemPrice);
     return response;
 }
 
@@ -657,6 +659,21 @@ function getFlavoredName(outputKey, inputItemName) {
 
 function getQualityString(quality) {
     return objGameData.Quality[quality].quality;
+}
+
+function getOutputPrice(output, inputItemPrice) {
+    const item = {
+        Category: output.Category,
+        Name: output.Name,
+        Price: output.Price,
+        Quality: "0",
+    };
+    console.log(output, inputItemPrice)
+    console.log(item)
+    if (output.IsFlavoredItem) {
+        item.Price = inputItemPrice * output.Multiplier + output.Price;
+    }
+    return getSellPrice(item);
 }
 
 function getSellPrice(item) {
@@ -686,5 +703,14 @@ function getSellPrice(item) {
     const isAffectedBySpringOnion = name === "Spring Onion";
     const springOnionMultiplier = hasSpringOnion && isAffectedBySpringOnion ? 5 : 1;
 
-    return Math.floor(item.Price * qualityMultiplier * tillerMultiplier * artisanMultiplier * bearMultiplier * springOnionMultiplier);
+    let price = Math.floor(
+        item.Price 
+        * qualityMultiplier
+        * tillerMultiplier
+        * bearMultiplier
+        * springOnionMultiplier
+    );
+    price = Math.floor(Math.round(price * artisanMultiplier * 10) / 10);
+
+    return price;
 }
