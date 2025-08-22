@@ -9,8 +9,7 @@ const JSON_URL_CATEGORIES = "./gameData/categories.json";
 const JSON_URL_PROFESSIONS = "./gameData/professions.json";
 const JSON_URL_QUALITY = "./gameData/quality.json";
 const JSON_URL_MULTIPLIERS = "./gameData/machines_multipliers.json";
-// const JSON_URL_COLORS = ""
-// const JSON_URL_ITEM_TYPES = "";
+
 const BEAR_KNOWLEDGE_EVENT = "2120303";
 const SPRING_ONION_MASTERY_EVENT = "3910979";
 
@@ -22,7 +21,7 @@ let machinesData;
 let saveFileData;
 
 async function deleteThis() {
-    const URL = "./test files/DumbBunnies_411596522";
+    const URL = "./test files/Possum_415500486";
     const response = await fetch(URL);
     const contents = await response.text(response);
 
@@ -65,8 +64,6 @@ async function loadJsonFiles() {
     obj.Professions = await loadJson(JSON_URL_PROFESSIONS);
     obj.Quality = await loadJson(JSON_URL_QUALITY);
     obj.Multipliers = await loadJson(JSON_URL_MULTIPLIERS);
-    // obj.Colors = await loadJson(JSON_URL_COLORS);
-    // obj.ItemTypes = await loadJson(JSON_URL_ITEM_TYPES);
 
     return obj;
 }
