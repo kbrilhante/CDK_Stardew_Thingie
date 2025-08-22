@@ -573,7 +573,8 @@ function fillTable() {
     const machineHeaders = [
         { header: `{machine} Processed Item`, type: "string" },
         { header: `{machine} Processed Sell Price`, type: "number" },
-        { header: `{machine} Profit (g/input item)`, type: "number" },
+        { header: `{machine} Cost`, type: "number" },
+        { header: `{machine} Profit`, type: "number" },
         { header: `{machine} Productivity (g/minute)`, type: "number" },
         // { header: `{machine} Aproximate g/day`, type: "number" },
     ];
@@ -615,7 +616,7 @@ function fillTable() {
     }
 
     const table = createTable(document.getElementById("divTable"), "table", objTableInfo);
-    console.log(table);
+    makeTableSortable(table);
 }
 
 function getItemByTrigger(machineData, trigger) {
@@ -636,7 +637,7 @@ function getMachineColumns(inputItem, machine, machineHeaders) {
     const outputKey = getItemByTrigger(machineData, inputItem); // gets the key of the machine processed product
     if (!outputKey) return null;
 
-    const response = [];
+    const response = new Array(machineHeaders.length);
 
     const inputItemPrice = inputItem.Price;
     const inputItemName = inputItem.Name;
@@ -650,9 +651,12 @@ function getMachineColumns(inputItem, machine, machineHeaders) {
     
     // sell price
     const sellPrice = getOutputPrice(output, inputItemPrice);
+
+    // cost
+    const cost = getSellPrice(inputItem) * product.Triggers.RequiredCount;
     
     // profit
-    const profit = (sellPrice - getSellPrice(inputItem)) / product.Triggers.RequiredCount;    
+    const profit = sellPrice - cost;
     
     // productivity g/minute
     const minutesInADay = 1600;
@@ -661,19 +665,23 @@ function getMachineColumns(inputItem, machine, machineHeaders) {
     
     // g/day
     const goldDay = Math.round(productivity * 1600);
-    
-    for (const header of machineHeaders) {
+
+    for (const entry of machineHeaders.entries()) {
+        const index = entry[0];
+        const header = entry[1];
         const title = header.header;
         if (title.includes("Processed Item")) {
-            response.push(processedItemName);
+            response[index] = processedItemName;
         } else if (title.includes("Processed Sell Price")) {
-            response.push(sellPrice);
-        } else if (title.includes("Profit (g/input item)")) {
-            response.push(profit);
+            response[index] = sellPrice;
+        } else if (title.includes("Cost")) {
+            response[index] = cost;
+        } else if (title.includes("Profit")) {
+            response[index] = profit;
         } else if (title.includes("Productivity (g/minute)")) {
-            response.push(productivity);
+            response[index] = productivity;
         } else if (title.includes("Aproximate g/day")) {
-            response.push(goldDay);
+            response[index] = goldDay;
         }
     }
 
