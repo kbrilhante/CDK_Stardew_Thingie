@@ -82,7 +82,7 @@ function content() {
 
     const divTable = createDiv(contentTag);
     divTable.id = "divTable";
-    // divTable.style.display = "none";
+    divTable.style.display = "none";
 }
 
 function createFieldSet(parent, legendText) {
@@ -121,7 +121,6 @@ function createMachineInput(parent, txtLabel) {
 
     const chk = createCheckBox(div, `chk${txtLabel}`);
     chk.checked = true;
-    // chk.onchange = toggleMachine;
 
     const span = document.createElement("span");
     span.className = "input-group-text";

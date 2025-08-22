@@ -20,19 +20,6 @@ let objGameData;
 let machinesData;
 let saveFileData;
 
-async function deleteThis() {
-    const URL = "./test files/Possum_415500486";
-    const response = await fetch(URL);
-    const contents = await response.text(response);
-
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(contents, "application/xml");
-    const saveFile = xmlToJson(xmlDoc.documentElement);
-    handleSaveFile(saveFile);
-    filterInventory();
-    fillTable();
-}
-
 function startup() {
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
     document.getElementById("chkFillAll").addEventListener("change", fillTable);
@@ -48,8 +35,6 @@ function startup() {
         objGameData = data;
         console.log("game data", objGameData);
         getMachineDetails();
-
-        deleteThis();
     });
 }
 
@@ -617,6 +602,7 @@ function fillTable() {
 
     const table = createTable(document.getElementById("divTable"), "table", objTableInfo);
     makeTableSortable(table);
+    document.getElementById("divTable").style.display = "block";
 }
 
 function getItemByTrigger(machineData, trigger) {
