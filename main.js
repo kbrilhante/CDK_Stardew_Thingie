@@ -77,12 +77,50 @@ function content() {
     }
 
     const fsOptions = createFieldSet(divFieldSets, "Options");
-    createCheckBox(fsOptions, "chkFillAll", "Fill all machines of the same type with the same crop");
-    fsOptions.style.display = "none";
+    createCheckBox(fsOptions, "chkFillAll", "Show only items that are enough to fill machine");
+    createSelect(fsOptions, "selFillAll", []);
 
     const divTable = createDiv(contentTag);
     divTable.id = "divTable";
     divTable.style.display = "none";
+}
+
+/**
+ * 
+ * @param {HTMLFieldSetElement} parent 
+ * @param {string} id 
+ * @param {Array} options 
+ * @returns {HTMLSelectElement}
+ */
+function createSelect(parent, id, options) {
+    let select = document.createElement("select");
+    select.className = "form-select";
+    select.setAttribute("aria-label", "Machine select");
+    select.id = id;
+    parent.appendChild(select);
+
+    setSelectOptions(id, options);
+
+    return select;
+}
+
+/**
+ * 
+ * @param {string} id 
+ * @param {Array} options 
+ */
+function setSelectOptions(id, options) {
+    const select = document.getElementById(id);
+
+    for (const entry of options.entries()) {
+        const index = entry[0];
+        const opt = entry[1];
+        const optionTag = document.createElement("option");
+        if (index === 1) optionTag.selected = true;
+        optionTag.value = opt;
+        optionTag.text = opt;
+        select.appendChild(optionTag);
+    }
 }
 
 function createFieldSet(parent, legendText) {

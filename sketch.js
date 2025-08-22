@@ -21,6 +21,8 @@ let machinesData;
 let saveFileData;
 
 function startup() {
+    setSelectOptions("selFillAll", MACHINES);
+
     document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
     document.getElementById("chkFillAll").addEventListener("change", fillTable);
     document.getElementById("chkTiller").addEventListener("change", fillTable);
@@ -30,12 +32,22 @@ function startup() {
     for (const machine of MACHINES) {
         document.getElementById(`chk${machine}`).addEventListener("change", fillTable);
     }
+    document.getElementById("chkFillAll").addEventListener("change", fillTable);
+    document.getElementById("selFillAll").addEventListener("change", fillTable);
 
     loadJsonFiles().then((data) => {
         objGameData = data;
         console.log("game data", objGameData);
         getMachineDetails();
+        testingThingsAndStuff();
     });
+}
+
+async function testingThingsAndStuff() {
+    const url = "./test files/Possum_415500486";
+    const response = await fetch(url);
+    const contents = await response.text();
+    parseSaveFile(contents);
 }
 
 async function loadJsonFiles() {
@@ -303,13 +315,7 @@ function loadSaveFile(e) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const contents = e.target.result;
-
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(contents, "application/xml");
-        const saveFile = xmlToJson(xmlDoc.documentElement);
-        handleSaveFile(saveFile);
-        filterInventory();
-        fillTable();
+        parseSaveFile(contents);
     }
 
     reader.onerror = (err) => {
@@ -317,6 +323,15 @@ function loadSaveFile(e) {
     }
 
     reader.readAsText(file);
+}
+
+function parseSaveFile(contents) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(contents, "application/xml");
+    const saveFile = xmlToJson(xmlDoc.documentElement);
+    handleSaveFile(saveFile);
+    filterInventory();
+    fillTable();
 }
 
 function handleSaveFile(saveObj) {
@@ -569,7 +584,7 @@ function fillTable() {
             machines.push(machine);
             const columns = [];
             for (const header of machineHeaders) {
-                const newHeader = {...header}
+                const newHeader = { ...header }
                 newHeader.header = newHeader.header.replace("{machine}", machine);
                 columns.push(newHeader)
             };
@@ -627,28 +642,28 @@ function getMachineColumns(inputItem, machine, machineHeaders) {
 
     const inputItemPrice = inputItem.Price;
     const inputItemName = inputItem.Name;
-    
+
     const product = machineData[outputKey];
     const output = product.Output;
     const isFlavoredItem = output.IsFlavoredItem;
 
     // processed item name
     const processedItemName = isFlavoredItem ? getFlavoredName(outputKey, inputItemName) : output.Name;
-    
+
     // sell price
     const sellPrice = getOutputPrice(output, inputItemPrice);
 
     // cost
     const cost = getSellPrice(inputItem) * product.Triggers.RequiredCount;
-    
+
     // profit
     const profit = sellPrice - cost;
-    
+
     // productivity g/minute
     const minutesInADay = 1600;
     const processingTimeMins = product.MinutesUntilReady > 0 ? product.MinutesUntilReady : product.DaysUntilReady * minutesInADay;
     const productivity = Math.round(profit / processingTimeMins * 1000) / 1000;
-    
+
     // g/day
     const goldDay = Math.round(productivity * 1600);
 
