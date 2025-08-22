@@ -1,3 +1,14 @@
+.table-responsive {
+  min-height: auto;
+  max-height: 96vh;
+}
+
+.table-sort thead {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+}
+
 .table-sort thead th[data-sort] {
   cursor: pointer;
   user-select: none;
