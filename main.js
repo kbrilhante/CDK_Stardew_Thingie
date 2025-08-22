@@ -77,8 +77,8 @@ function content() {
     }
 
     const fsOptions = createFieldSet(divFieldSets, "Options");
-
     createCheckBox(fsOptions, "chkFillAll", "Fill all machines of the same type with the same crop");
+    fsOptions.style.display = "none";
 
     const divTable = createDiv(contentTag);
     divTable.id = "divTable";

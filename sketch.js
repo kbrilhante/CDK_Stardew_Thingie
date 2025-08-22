@@ -618,7 +618,7 @@ function fillTable() {
     }
 
     const table = createTable(document.getElementById("divTable"), "table", objTableInfo);
-    console.log(table)
+    console.log(table);
 }
 
 function getItemByTrigger(machineData, trigger) {
@@ -635,8 +635,6 @@ function getItemByTrigger(machineData, trigger) {
 }
 
 function getMachineColumns(inputItem, machine, machineHeaders) {
-    console.log("--- machine ---", machine)
-
     const machineData = machinesData[machine];
     const outputKey = getItemByTrigger(machineData, inputItem); // gets the key of the machine processed product
     if (!outputKey) return null;
@@ -645,10 +643,8 @@ function getMachineColumns(inputItem, machine, machineHeaders) {
 
     const inputItemPrice = inputItem.Price;
     const inputItemName = inputItem.Name;
-    console.log("input item:", inputItemName);
-    console.log("input item price:", inputItemPrice);
+    
     const product = machineData[outputKey];
-    console.log(outputKey, product);
     const output = product.Output;
     const isFlavoredItem = output.IsFlavoredItem;
 
@@ -670,7 +666,6 @@ function getMachineColumns(inputItem, machine, machineHeaders) {
     const goldDay = Math.round(productivity * 1600);
     
     for (const header of machineHeaders) {
-        console.log(header.header)
         const title = header.header;
         if (title.includes("Processed Item")) {
             response.push(processedItemName);
