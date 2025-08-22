@@ -6,7 +6,13 @@
 .table-sort thead {
   position: sticky;
   top: 0;
-  z-index: 0;
+  z-index: 10;
+}
+
+.table-sort th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
 }
 
 .table-sort thead th[data-sort] {
