@@ -176,10 +176,15 @@ function getInputValue(id) {
 
 function createTable(parent, id, content) {
     parent.innerHTML = "";
+
+    const divResp = document.createElement("div");
+    divResp.className = "table-responsive";
+    parent.appendChild(divResp);
+
     const table = document.createElement("table");
     table.id = id;
-    table.className = "table table-striped-columns table-hover";
-    parent.appendChild(table);
+    table.className = "table table-striped-columns table-hover table-sort";
+    divResp.appendChild(table)
 
     const headers = content.headers;
     const thead = document.createElement("thead");
@@ -229,8 +234,13 @@ function createTableHeader(headers) {
         const th = document.createElement("th");
         th.scope = "col";
         th.innerHTML = objHeader.header;
-        th.setAttribute("data-type", objHeader.type);
+        th.setAttribute("data-sort", objHeader.type);
+        th.ariaSort = "none";
         tr.appendChild(th);
+
+        const span = document.createElement("span");
+        span.className = "indicator";
+        th.appendChild(span);
     }
 
     return tr;
@@ -259,4 +269,70 @@ function createTableBodyRow(bodyRow) {
     }
 
     return tr;
+}
+
+/**
+ * 
+ * @param {HTMLElement} table 
+ */
+function makeTableSortable(table) {
+    const headers = table.querySelectorAll("th[data-sort");
+    const tBody = table.querySelector("tbody");
+    if (!tBody) {
+        console.error("Table does not have a <tbody> element.");
+        return;
+    }
+
+    console.log(tBody)
+    for (const entry of headers.entries()) {
+        const colIndex = entry[0];
+        const header = entry[1];
+        header.addEventListener("click", () => {
+            const currentSort = header.getAttribute("aria-sort");
+
+            let newSort;
+            switch (currentSort) {
+                case "ascending":
+                    newSort = "descending";
+                    break;
+                case "descending":
+                default:
+                    newSort = "ascending";
+                    break;
+            }
+
+            for (const otherHeader of headers) {
+                if (otherHeader !== header) {
+                    otherHeader.setAttribute("aria-sort", "none");
+                }
+            }
+
+            header.setAttribute("aria-sort", newSort);
+
+            const  dataType = header.getAttribute("data-sort");
+
+            const rows = Array.from(tBody.querySelectorAll("tr"));
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.children[colIndex].textContent.trim();
+                const cellB = rowB.children[colIndex].textContent.trim();
+
+                let compareValue;
+
+                if (dataType === "number") {
+                    const numA = cellA === "-" || cellA === "" ? -Infinity : parseFloat(cellA);
+                    const numB = cellB === "-" || cellB === "" ? -Infinity : parseFloat(cellB);
+                    compareValue = numA - numB;
+                } else {
+                    compareValue = cellA.localeCompare(cellB, undefined, { sensitivity: "base" })
+                }
+
+                return newSort === "ascending" ? compareValue : -compareValue;
+            });
+
+            tBody.innerHTML = "";
+            for (const row of rows) {
+                tBody.appendChild(row);
+            }
+        });
+    }
 }

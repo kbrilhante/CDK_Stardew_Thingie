@@ -1,0 +1,20 @@
+.table-sort thead th[data-sort] {
+  cursor: pointer;
+  user-select: none;
+}
+.table-sort thead th .indicator {
+  margin-left: 0.4rem;
+  opacity: 0.6;
+}
+
+.table-sort thead th[aria-sort="ascending"] .indicator::after {
+  content: "▲";
+  opacity: 1;
+}
+.table-sort thead th[aria-sort="descending"] .indicator::after {
+  content: "▼";
+  opacity: 1;
+}
+.table-sort thead th[aria-sort="none"] .indicator::after {
+  content: "↕";
+}
