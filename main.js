@@ -107,16 +107,16 @@ function createSelect(parent, id, options) {
 /**
  * 
  * @param {string} id 
- * @param {Array} options 
+ * @param {Array<string>} options 
  */
 function setSelectOptions(id, options) {
     const select = document.getElementById(id);
-
+    select.innerHTML = "";
     for (const entry of options.entries()) {
         const index = entry[0];
         const opt = entry[1];
         const optionTag = document.createElement("option");
-        if (index === 1) optionTag.selected = true;
+        if (index === 0) optionTag.selected = true;
         optionTag.value = opt;
         optionTag.text = opt;
         select.appendChild(optionTag);
@@ -157,7 +157,7 @@ function createMachineInput(parent, txtLabel) {
     const div = createFormDiv(parent);
     div.className = "input-group mb-3";
 
-    const chk = createCheckBox(div, `chk${txtLabel}`);
+    const chk = createCheckBox(div, formatMachineId("chk", txtLabel));
     chk.checked = true;
 
     const span = document.createElement("span");
@@ -168,7 +168,7 @@ function createMachineInput(parent, txtLabel) {
     const inpNumber = document.createElement("input");
     inpNumber.type = "number";
     inpNumber.className = "form-control";
-    inpNumber.id = `inp${txtLabel}`;
+    inpNumber.id = formatMachineId("inp", txtLabel);
     inpNumber.value = 0;
     div.appendChild(inpNumber);
 }
@@ -372,4 +372,13 @@ function makeTableSortable(table) {
             }
         });
     }
+}
+
+/**
+ * 
+ * @param {string} machineName 
+ * @returns 
+ */
+function formatMachineId(txt, machineName) {
+    return `${txt}${machineName.replaceAll(" ", "")}`;
 }

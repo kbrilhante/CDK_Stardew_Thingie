@@ -30,7 +30,11 @@ function startup() {
     document.getElementById("chkBear").addEventListener("change", fillTable);
     document.getElementById("chkSprOnion").addEventListener("change", fillTable);
     for (const machine of MACHINES) {
-        document.getElementById(`chk${machine}`).addEventListener("change", fillTable);
+        document.getElementById(formatMachineId("chk", machine)).addEventListener("change", () => {
+            const activeMachines = MACHINES.filter(mach => { return document.getElementById(formatMachineId("chk", mach)).checked });
+            setSelectOptions("selFillAll", activeMachines);
+            fillTable();
+        })
     }
     document.getElementById("chkFillAll").addEventListener("change", fillTable);
     document.getElementById("selFillAll").addEventListener("change", fillTable);
@@ -39,12 +43,13 @@ function startup() {
         objGameData = data;
         console.log("game data", objGameData);
         getMachineDetails();
-        testingThingsAndStuff();
+        // testingThingsAndStuff();
     });
 }
 
 async function testingThingsAndStuff() {
-    const url = "./test files/Possum_415500486";
+    document.getElementById("chkFillAll").checked = true;
+    const url = "./test files/DumbBunnies_411596522";
     const response = await fetch(url);
     const contents = await response.text();
     parseSaveFile(contents);
@@ -337,13 +342,12 @@ function parseSaveFile(contents) {
 function handleSaveFile(saveObj) {
     saveFileData = {};
 
-    console.log(saveObj);
+    console.log("save file", saveObj);
 
     const allItems = sortItemsByLocation(saveObj);
-    console.log("all items", allItems)
-    let machines = getMachines(allItems);
-    saveFileData.Machines = machines;
+    console.log("all items", allItems);
 
+    saveFileData.Machines = getMachines(allItems);
     saveFileData.ChestItems = getChests(allItems);
 
     const player = saveObj.player;
@@ -514,7 +518,7 @@ function fillPlayerInfo() {
     fillCheckBox("chkSprOnion", saveFileData.HasSpringOnionMastery);
     for (const machine in saveFileData.Machines) {
         const value = saveFileData.Machines[machine].TotalAmount;
-        setInputValue(`inp${machine}`, value);
+        setInputValue(formatMachineId("inp", machine), value);
     }
 }
 
@@ -556,9 +560,10 @@ function filterItems(allItems, items, location) {
 
 function fillTable() {
     if (!saveFileData) return;
+    saveFileData.fillAllFilterOn = document.getElementById("chkFillAll").checked;
+    saveFileData.fillAllMachine = document.getElementById("selFillAll").value;
     console.log("save file", saveFileData);
-    const chkFillAll = document.getElementById("chkFillAll").checked;
-    console.log("fill all?", chkFillAll);
+    console.log("fill all?", saveFileData.fillAllFilterOn, saveFileData.fillAllMachine);
 
     const objTableInfo = {};
 
@@ -569,7 +574,7 @@ function fillTable() {
         { header: "Quantity", type: "number" },
         { header: "Input Item Sell Price", type: "number" },
     ];
-    const machines = [];
+    const machines = [];    
     const machineHeaders = [
         { header: `{machine} Processed Item`, type: "string" },
         { header: `{machine} Processed Sell Price`, type: "number" },
@@ -578,8 +583,9 @@ function fillTable() {
         { header: `{machine} Productivity (g/minute)`, type: "number" },
         // { header: `{machine} Aproximate g/day`, type: "number" },
     ];
+
     for (const machine of MACHINES) {
-        const chkMachine = document.getElementById(`chk${machine}`);
+        const chkMachine = document.getElementById(formatMachineId("chk", machine));
         if (chkMachine.checked) {
             machines.push(machine);
             const columns = [];
@@ -601,6 +607,7 @@ function fillTable() {
             getSellPrice(item),
         ];
         let hasMachines = false;
+        if (!hasEnoughItems(item)) continue;
         for (const machine of machines) {
             const machineColumns = getMachineColumns(item, machine, machineHeaders);
             if (!machineColumns) {
@@ -618,6 +625,19 @@ function fillTable() {
     const table = createTable(document.getElementById("divTable"), "table", objTableInfo);
     makeTableSortable(table);
     document.getElementById("divTable").style.display = "block";
+}
+
+function hasEnoughItems(inputItem) {
+    if (!saveFileData.fillAllFilterOn) return true;
+    const machine = saveFileData.fillAllMachine;
+    const machineData = machinesData[machine];
+    if (machineData.AllTriggers.find(machineItem => machineItem === inputItem.Name) === undefined) return false;
+    const outputKey = getItemByTrigger(machineData, inputItem);
+    const requiredCount = machineData[outputKey].Triggers.RequiredCount;
+    const machinesAmt = document.getElementById(formatMachineId("inp", machine)).value;
+    const needed = requiredCount * machinesAmt;
+    const stackSize = inputItem.Stack;
+    return stackSize > needed;
 }
 
 function getItemByTrigger(machineData, trigger) {
