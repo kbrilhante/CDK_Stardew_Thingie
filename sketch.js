@@ -1,6 +1,7 @@
 // constants
 const TITLE = "Stardew Valley Thingie";
 const FILE_ID = "stardewFile";
+const DIV_FILE_ID = "divFile";
 const JSON_URL_BC = "./gameData/Data/BigCraftables.json";
 const JSON_URL_MACHINES = "./gameData/Data/Machines.json";
 const JSON_URL_OBJECTS = "./gameData/Data/Objects.json";
@@ -23,7 +24,8 @@ let saveFileData;
 function startup() {
     setSelectOptions("selFillAll", MACHINES);
 
-    document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
+    createFileSection(loadSaveFile);
+    // document.getElementById(FILE_ID).addEventListener("change", loadSaveFile);
     document.getElementById("chkFillAll").addEventListener("change", fillTable);
     document.getElementById("chkTiller").addEventListener("change", fillTable);
     document.getElementById("chkArtisan").addEventListener("change", fillTable);
@@ -328,6 +330,8 @@ function loadSaveFile(e) {
     }
 
     reader.readAsText(file);
+
+    createFileSection(loadSaveFile);
 }
 
 function parseSaveFile(contents) {

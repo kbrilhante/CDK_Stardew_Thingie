@@ -9,42 +9,7 @@ function content() {
     const contentTag = document.getElementById("main");
 
     const divFile = createDiv(contentTag);
-
-    const lblFile = document.createElement("label");
-    lblFile.htmlFor = "#" + FILE_ID;
-    lblFile.className = "form-label";
-    lblFile.textContent = "Upload save file:";
-    divFile.appendChild(lblFile);
-
-    const inpFile = document.createElement("input");
-    inpFile.type = "file";
-    inpFile.name = FILE_ID;
-    inpFile.id = FILE_ID;
-    inpFile.className = "form-control";
-    divFile.appendChild(inpFile);
-
-    const txtInstructions = document.createElement("p");
-    txtInstructions.textContent = "Use the full name of the farm as \"SaveGameInfo\" does not have all the information needed."
-    txtInstructions.className = "fs-6 text-muted mb-0 mt-2";
-    divFile.appendChild(txtInstructions);
-
-    const txtFileLocation = document.createElement("p");
-    txtFileLocation.textContent = "File locations:"
-    txtFileLocation.className = "fs-6 text-muted mb-0 mt-2";
-    divFile.appendChild(txtFileLocation);
-
-    const ulLocationsList = document.createElement("ul");
-    divFile.appendChild(ulLocationsList);
-
-    const txtFileLocationWin = document.createElement("li");
-    txtFileLocationWin.textContent = "Windows: %AppData%\\StardewValley\\Saves\\";
-    txtFileLocationWin.className = "fs-6 text-muted";
-    ulLocationsList.appendChild(txtFileLocationWin);
-
-    const txtFileLocationMacLinux = document.createElement("li");
-    txtFileLocationMacLinux.textContent = "Mac OSX & Linux: ~/.config/StardewValley/Saves/";
-    txtFileLocationMacLinux.className = "fs-6 text-muted";
-    ulLocationsList.appendChild(txtFileLocationMacLinux);
+    divFile.id = DIV_FILE_ID;
 
     const divFarmerPerks = createDiv(contentTag);
 
@@ -381,4 +346,48 @@ function makeTableSortable(table) {
  */
 function formatMachineId(txt, machineName) {
     return `${txt}${machineName.replaceAll(" ", "")}`;
+}
+
+function createFileSection(callback) {
+    const parent = document.getElementById(DIV_FILE_ID);
+    parent.innerHTML = "";
+
+    const lblFile = document.createElement("label");
+    lblFile.htmlFor = "#" + FILE_ID;
+    lblFile.className = "form-label";
+    lblFile.textContent = "Upload save file:";
+    parent.appendChild(lblFile);
+
+    const inpFile = document.createElement("input");
+    inpFile.type = "file";
+    inpFile.name = FILE_ID;
+    inpFile.id = FILE_ID;
+    inpFile.className = "form-control";
+    inpFile.onchange = callback;
+    parent.appendChild(inpFile);
+
+    const txtInstructions = document.createElement("p");
+    txtInstructions.textContent = "Use the full name of the farm as \"SaveGameInfo\" does not have all the information needed."
+    txtInstructions.className = "fs-6 text-muted mb-0 mt-2";
+    parent.appendChild(txtInstructions);
+
+    const txtFileLocation = document.createElement("p");
+    txtFileLocation.textContent = "File locations:"
+    txtFileLocation.className = "fs-6 text-muted mb-0 mt-2";
+    parent.appendChild(txtFileLocation);
+
+    const ulLocationsList = document.createElement("ul");
+    parent.appendChild(ulLocationsList);
+
+    const txtFileLocationWin = document.createElement("li");
+    txtFileLocationWin.textContent = "Windows: %AppData%\\StardewValley\\Saves\\";
+    txtFileLocationWin.className = "fs-6 text-muted";
+    ulLocationsList.appendChild(txtFileLocationWin);
+
+    const txtFileLocationMacLinux = document.createElement("li");
+    txtFileLocationMacLinux.textContent = "Mac OSX & Linux: ~/.config/StardewValley/Saves/";
+    txtFileLocationMacLinux.className = "fs-6 text-muted";
+    ulLocationsList.appendChild(txtFileLocationMacLinux);
+
+    return inpFile;
 }
